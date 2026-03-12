@@ -38,7 +38,7 @@ class World {
   }
 
   addToMap(mo) {
-    this.clouds.forEach((cloud) => {
+    this.clouds.forEach(() => {
       this.ctx.drawImage(mo.img, mo.x, mo.y, mo.width, mo.height);
     });
   }
