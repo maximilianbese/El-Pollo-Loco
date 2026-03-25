@@ -37,6 +37,8 @@ class Endboss extends MovableObject {
   ];
 
   deadAnimDone = false;
+  // Zählt wie oft die Dead-Animation schon gelaufen ist
+  deadFrameIndex = 0;
 
   constructor() {
     super().loadImage(this.IMAGES_ALERT[0]);
@@ -52,8 +54,18 @@ class Endboss extends MovableObject {
     setInterval(() => {
       if (this.isDead()) {
         if (!this.deadAnimDone) {
-          this.playAnimation(this.IMAGES_DEAD);
+          // Manuell durch alle 3 Dead-Frames durchlaufen
+          const path = this.IMAGES_DEAD[this.deadFrameIndex];
+          this.img = this.imageCache[path];
+          this.deadFrameIndex++;
+
+          if (this.deadFrameIndex >= this.IMAGES_DEAD.length) {
+            this.deadAnimDone = true;
+            // Letztes Frame eingefroren anzeigen, dann Win-Screen
+            setTimeout(() => showWinScreen(), 800);
+          }
         }
+        // Nach deadAnimDone bleibt letztes Frame stehen – kein weiteres Cycling
       } else if (this.isHurt()) {
         this.playAnimation(this.IMAGES_HURT);
       } else if (this.hadFirstContact) {
@@ -70,10 +82,5 @@ class Endboss extends MovableObject {
     this.energy -= 20;
     if (this.energy < 0) this.energy = 0;
     this.lastHit = new Date().getTime();
-
-    if (this.isDead() && !this.deadAnimDone) {
-      this.deadAnimDone = true;
-      setTimeout(() => showWinScreen(), 1500);
-    }
   }
 }

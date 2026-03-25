@@ -1,0 +1,183 @@
+/* ═══════════════════════════════════════════════════════
+   MOBILE.CSS  –  El Pollo Loco  –  Touch Controls
+   ═══════════════════════════════════════════════════════
+
+   Mobile controls are hidden by default (desktop).
+   They appear on touch devices and small screens.
+   Layout:
+     [ D-Pad (left/right) ]      [ Action (jump / throw) ]
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Mobile Controls Container ─────────────────────────── */
+#mobile-controls {
+  display: none; /* hidden on desktop */
+}
+
+/* ── Show on touch-capable / narrow screens ─────────────── */
+@media (hover: none), (max-width: 600px) {
+  /* Show touch info on start screen, hide keyboard info */
+  #keyboard-info {
+    display: none !important;
+  }
+  #touch-info {
+    display: block !important;
+  }
+
+  /* Hide desktop key-legend in-game */
+  #key-legend {
+    display: none;
+  }
+
+  /* ── Controls bar below canvas ────────────────────────── */
+  #mobile-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: min(720px, 100vw);
+    background: rgba(0, 0, 0, 0.55);
+    padding: clamp(8px, 2vw, 14px) clamp(12px, 4vw, 28px);
+    gap: 12px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+
+  /* ── D-Pad (left + right) ──────────────────────────────── */
+  .dpad {
+    display: flex;
+    gap: clamp(8px, 3vw, 18px);
+    align-items: center;
+  }
+
+  .dpad-btn {
+    width: clamp(52px, 14vw, 72px);
+    height: clamp(52px, 14vw, 72px);
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: clamp(20px, 5vw, 28px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background 0.08s,
+      transform 0.06s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+  }
+
+  .dpad-btn:active,
+  .dpad-btn.pressed {
+    background: rgba(245, 166, 35, 0.55);
+    border-color: #f5a623;
+    transform: scale(0.93);
+  }
+
+  /* ── Action Buttons ─────────────────────────────────────── */
+  .action-btns {
+    display: flex;
+    gap: clamp(10px, 3vw, 20px);
+    align-items: center;
+  }
+
+  .action-btn {
+    width: clamp(56px, 15vw, 76px);
+    height: clamp(56px, 15vw, 76px);
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: clamp(20px, 5vw, 28px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background 0.08s,
+      transform 0.06s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+  }
+
+  /* Jump button – blue accent */
+  .btn-jump {
+    background: rgba(40, 120, 255, 0.25);
+    border-color: rgba(80, 160, 255, 0.6);
+    font-size: clamp(22px, 5.5vw, 30px);
+  }
+  .btn-jump:active,
+  .btn-jump.pressed {
+    background: rgba(40, 120, 255, 0.65);
+    border-color: #60aaff;
+    transform: scale(0.93);
+  }
+
+  /* Throw button – orange accent */
+  .btn-throw {
+    background: rgba(220, 80, 0, 0.25);
+    border-color: rgba(255, 140, 0, 0.6);
+  }
+  .btn-throw:active,
+  .btn-throw.pressed {
+    background: rgba(220, 80, 0, 0.65);
+    border-color: #ff8c00;
+    transform: scale(0.93);
+  }
+}
+
+/* ── Extra small: 320px – 479px ─────────────────────────── */
+@media (max-width: 479px) {
+  .dpad-btn {
+    width: clamp(44px, 13vw, 58px);
+    height: clamp(44px, 13vw, 58px);
+    font-size: clamp(17px, 4.5vw, 22px);
+  }
+  .action-btn {
+    width: clamp(48px, 14vw, 62px);
+    height: clamp(48px, 14vw, 62px);
+    font-size: clamp(17px, 4.5vw, 22px);
+  }
+  #mobile-controls {
+    padding: 6px 10px;
+    gap: 8px;
+  }
+}
+
+/* ── Landscape phone: controls side-by-side with canvas ─── */
+@media (max-height: 500px) and (orientation: landscape) {
+  #game-wrapper {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+    height: 100dvh;
+  }
+
+  #game-container {
+    /* Fill available height, keep aspect ratio */
+    height: 100dvh;
+    width: auto;
+    aspect-ratio: 720 / 480;
+    flex-shrink: 0;
+  }
+
+  #mobile-controls {
+    flex-direction: column;
+    justify-content: space-around;
+    width: clamp(100px, 20vw, 140px);
+    height: 100dvh;
+    padding: 12px 8px;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .dpad {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .action-btns {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

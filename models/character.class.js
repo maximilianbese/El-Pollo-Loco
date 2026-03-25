@@ -82,7 +82,8 @@ class Character extends MovableObject {
         this.playAnimation(this.IMAGES_DEAD);
         if (!this.deadSoundPlayed) {
           this.deadSoundPlayed = true;
-          setTimeout(() => showGameOver(), 1200);
+          // Verkürzt auf 500ms – Game Over erscheint schneller
+          setTimeout(() => showGameOver(), 500);
         }
       } else if (this.isHurt()) {
         this.playAnimation(this.IMAGES_HURT);
