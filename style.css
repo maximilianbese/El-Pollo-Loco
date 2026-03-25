@@ -2,6 +2,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-image: url("img/5_background/website-background.jpg");
+  background-repeat: no-repeat;
+  background-size: 1400px 850px;
+  background-position: center;
 }
 
 canvas {
