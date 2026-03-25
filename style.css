@@ -1,13 +1,197 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  min-height: 100vh;
   background-image: url("img/5_background/website-background.jpg");
   background-repeat: no-repeat;
-  background-size: 1400px 850px;
+  background-size: cover;
   background-position: center;
+  font-family: "Arial", sans-serif;
+}
+
+/* ── START SCREEN ── */
+#start-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 3px solid #f5a623;
+  border-radius: 16px;
+  padding: 48px 64px;
+  color: #fff;
+  text-shadow: 2px 2px 4px #000;
+}
+
+#start-screen h1 {
+  font-size: 3rem;
+  color: #f5a623;
+  letter-spacing: 4px;
+}
+
+.key-info {
+  text-align: center;
+}
+
+.key-info h2 {
+  margin-bottom: 12px;
+  font-size: 1.3rem;
+}
+
+.key-info table {
+  margin: 0 auto;
+  border-collapse: collapse;
+}
+
+.key-info td {
+  padding: 6px 16px;
+  font-size: 1rem;
+}
+
+.key-info td:first-child {
+  font-weight: bold;
+  color: #f5a623;
+  text-align: right;
+}
+
+#start-btn,
+#fullscreen-btn {
+  padding: 14px 36px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    transform 0.1s,
+    background 0.2s;
+}
+
+#start-btn {
+  background: #f5a623;
+  color: #000;
+  font-weight: bold;
+}
+
+#start-btn:hover {
+  background: #e09010;
+  transform: scale(1.05);
+}
+
+#fullscreen-btn {
+  background: #444;
+  color: #fff;
+}
+
+#fullscreen-btn:hover {
+  background: #666;
+}
+
+/* ── GAME CONTAINER ── */
+#game-container {
+  position: relative;
 }
 
 canvas {
+  display: block;
   background-color: black;
+  border: 1px solid black;
+}
+
+/* ── HUD ── */
+#hud {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+#fs-btn {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 2px 8px;
+  font-size: 1rem;
+}
+
+#fs-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ── KEY LEGEND ── */
+#key-legend {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border-radius: 6px;
+  padding: 4px 16px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* ── OVERLAY SCREENS (Game Over / Win) ── */
+#game-over-screen,
+#win-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  border-radius: 4px;
+  text-align: center;
+}
+
+#game-over-screen h2 {
+  font-size: 2.5rem;
+  color: #e03030;
+}
+#win-screen h2 {
+  font-size: 2.5rem;
+  color: #f5a623;
+}
+
+#game-over-screen p,
+#win-screen p {
+  font-size: 1.1rem;
+}
+
+#game-over-screen button,
+#win-screen button {
+  margin-top: 8px;
+  padding: 12px 32px;
+  font-size: 1.1rem;
+  background: #f5a623;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+#game-over-screen button:hover,
+#win-screen button:hover {
+  background: #e09010;
 }

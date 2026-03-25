@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-    <title>Document</title>
+    <title>El Pollo Loco</title>
 
     <script src="./models/drawable-object.class.js"></script>
     <script src="./models/moveable-object.class.js"></script>
@@ -12,6 +12,8 @@
     <script src="./models/chicken.class.js"></script>
     <script src="./models/cloud.class.js"></script>
     <script src="./models/status-bar.class.js"></script>
+    <script src="./models/coin.class.js"></script>
+    <script src="./models/bottle-ground.class.js"></script>
     <script src="./models/world.class.js"></script>
     <script src="./models/backgound-object.class.js"></script>
     <script src="./models/keyboard.class.js"></script>
@@ -21,9 +23,69 @@
     <script src="./levels/level1.js"></script>
     <script src="./js/game.js"></script>
   </head>
-  <body onload="init()">
-    <h1>El Pollo Loco</h1>
+  <body>
+    <!-- START SCREEN -->
+    <div id="start-screen">
+      <h1>El Pollo Loco</h1>
+      <div class="key-info">
+        <h2>🎮 Steuerung</h2>
+        <table>
+          <tr>
+            <td>⬅ ➡</td>
+            <td>Bewegen</td>
+          </tr>
+          <tr>
+            <td>⎵ Leertaste</td>
+            <td>Springen</td>
+          </tr>
+          <tr>
+            <td>D</td>
+            <td>Flasche werfen</td>
+          </tr>
+          <tr>
+            <td>F</td>
+            <td>Fullscreen</td>
+          </tr>
+        </table>
+      </div>
+      <button id="start-btn" onclick="startGame()">▶ Spiel starten</button>
+      <button id="fullscreen-btn" onclick="toggleFullscreen()">
+        ⛶ Vollbild
+      </button>
+    </div>
 
-    <canvas id="canvas" width="720" height="480"> </canvas>
+    <!-- GAME CONTAINER -->
+    <div id="game-container" style="display: none; position: relative">
+      <canvas id="canvas" width="720" height="480"></canvas>
+
+      <!-- GAME OVER SCREEN -->
+      <div id="game-over-screen" style="display: none">
+        <h2>💀 Game Over</h2>
+        <p>Du wurdest besiegt!</p>
+        <button onclick="restartGame()">🔄 Neu starten</button>
+      </div>
+
+      <!-- WIN SCREEN -->
+      <div id="win-screen" style="display: none">
+        <h2>🎉 Du hast gewonnen!</h2>
+        <p>El Pollo Loco wurde besiegt!</p>
+        <button onclick="restartGame()">🔄 Nochmal spielen</button>
+      </div>
+
+      <!-- HUD CONTROLS -->
+      <div id="hud">
+        <span id="bottle-count">🍾 Flaschen: 0</span>
+        <span id="coin-count">🪙 Coins: 0</span>
+        <button id="fs-btn" onclick="toggleFullscreen()" title="Fullscreen">
+          ⛶
+        </button>
+      </div>
+
+      <!-- KEY LEGEND -->
+      <div id="key-legend">
+        ⬅➡ Bewegen &nbsp;|&nbsp; ⎵ Springen &nbsp;|&nbsp; D Werfen &nbsp;|&nbsp;
+        F Vollbild
+      </div>
+    </div>
   </body>
 </html>
