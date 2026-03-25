@@ -15,7 +15,7 @@ body {
   background-size: cover;
   background-position: center;
   font-family: "Rye", sans-serif;
-  font-weight: 100;
+  font-weight: 400;
 }
 
 /* ── START SCREEN ── */
@@ -195,4 +195,39 @@ canvas {
 #game-over-screen button:hover,
 #win-screen button:hover {
   background: #e09010;
+}
+
+/* Diese Regeln greifen nur, wenn der Container im Fullscreen-Modus ist */
+#game-container:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+}
+
+#game-container:fullscreen canvas {
+  /* Das Canvas füllt den Platz, behält aber sein Seitenverhältnis */
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  object-fit: contain;
+  border: none; /* Rand im Fullscreen entfernen */
+}
+
+/* Fix für Safari/Chrome/Edge */
+#game-container:-webkit-full-screen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#game-container:-webkit-full-screen canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
