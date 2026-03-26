@@ -17,8 +17,8 @@
     />
 
     <!-- Styles -->
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="mobile.css" />
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./mobile.css" />
 
     <!-- Game classes -->
     <script src="./models/drawable-object.class.js"></script>
@@ -42,6 +42,18 @@
     <script src="./js/game.js"></script>
   </head>
   <body>
+    <!-- ══ ROTATE DEVICE OVERLAY (Hochformat auf mobil) ════════════════ -->
+    <div id="rotate-overlay" aria-live="polite">
+      <div class="rotate-content">
+        <div class="rotate-icon">📱</div>
+        <div class="rotate-arrow">↻</div>
+        <p>Bitte drehe dein Gerät</p>
+        <p class="rotate-sub">
+          Das Spiel läuft nur im <strong>Querformat</strong>
+        </p>
+      </div>
+    </div>
+
     <!-- ══ START SCREEN ══════════════════════════════════════════════════ -->
     <div id="start-screen">
       <div class="start-bg">
@@ -132,31 +144,34 @@
           ⬅➡ Bewegen &nbsp;|&nbsp; ⎵ Springen &nbsp;|&nbsp; D Werfen
           &nbsp;|&nbsp; F Vollbild
         </div>
-      </div>
 
-      <!-- ── Mobile Controls ─────────────────────────────────────────── -->
-      <div id="mobile-controls">
-        <div class="dpad">
-          <button class="dpad-btn" id="btn-left" aria-label="Links">◀</button>
-          <button class="dpad-btn" id="btn-right" aria-label="Rechts">▶</button>
-        </div>
-        <div class="action-btns">
-          <button
-            class="action-btn btn-jump"
-            id="btn-jump"
-            aria-label="Springen"
-          >
-            ⬆
-          </button>
-          <button
-            class="action-btn btn-throw"
-            id="btn-throw"
-            aria-label="Werfen"
-          >
-            🍾
-          </button>
+        <!-- ── Mobile Controls (overlay auf dem Canvas) ──────────────── -->
+        <div id="mobile-controls">
+          <div class="dpad">
+            <button class="dpad-btn" id="btn-left" aria-label="Links">◀</button>
+            <button class="dpad-btn" id="btn-right" aria-label="Rechts">
+              ▶
+            </button>
+          </div>
+          <div class="action-btns">
+            <button
+              class="action-btn btn-jump"
+              id="btn-jump"
+              aria-label="Springen"
+            >
+              ⬆
+            </button>
+            <button
+              class="action-btn btn-throw"
+              id="btn-throw"
+              aria-label="Werfen"
+            >
+              🍾
+            </button>
+          </div>
         </div>
       </div>
+      <!-- /game-container -->
     </div>
     <!-- /game-wrapper -->
   </body>

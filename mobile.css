@@ -1,21 +1,100 @@
 /* ═══════════════════════════════════════════════════════
-   MOBILE.CSS  –  El Pollo Loco  –  Touch Controls
-   ═══════════════════════════════════════════════════════
-
-   Mobile controls are hidden by default (desktop).
-   They appear on touch devices and small screens.
-   Layout:
-     [ D-Pad (left/right) ]      [ Action (jump / throw) ]
+   MOBILE.CSS  –  El Pollo Loco
+   Controls als Overlay direkt auf dem Canvas
    ═══════════════════════════════════════════════════════ */
 
-/* ── Mobile Controls Container ─────────────────────────── */
-#mobile-controls {
-  display: none; /* hidden on desktop */
+/* ══════════════════════════════════════════════════════════
+   1. ROTATE-DEVICE OVERLAY
+   ══════════════════════════════════════════════════════════ */
+#rotate-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.93);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  color: #fff;
+  font-family: "Rye", sans-serif;
 }
 
-/* ── Show on touch-capable / narrow screens ─────────────── */
+.rotate-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+}
+
+.rotate-icon {
+  font-size: clamp(48px, 15vw, 80px);
+  animation: tiltPhone 1.6s ease-in-out infinite;
+  transform-origin: center center;
+  line-height: 1;
+}
+
+.rotate-arrow {
+  font-size: clamp(36px, 10vw, 60px);
+  color: #f5a623;
+  animation: spinArrow 1.6s ease-in-out infinite;
+}
+
+#rotate-overlay p {
+  font-size: clamp(1.1rem, 5vw, 1.6rem);
+  text-shadow: 1px 1px 4px #000;
+}
+.rotate-sub {
+  font-size: clamp(0.8rem, 3.5vw, 1rem) !important;
+  color: #ccc;
+  margin-top: 4px;
+}
+.rotate-sub strong {
+  color: #f5a623;
+}
+
+@keyframes tiltPhone {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(90deg);
+  }
+}
+@keyframes spinArrow {
+  0%,
+  100% {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+  50% {
+    opacity: 0.4;
+    transform: rotate(180deg);
+  }
+}
+
+/* Nur auf Touch + Hochformat + ≤ 900px */
+@media (hover: none) and (orientation: portrait) and (max-width: 900px) {
+  #rotate-overlay {
+    display: flex;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   2. MOBILE CONTROLS  – standardmäßig versteckt
+   ══════════════════════════════════════════════════════════ */
+#mobile-controls {
+  display: none;
+}
+
+/* ══════════════════════════════════════════════════════════
+   3. TOUCH-GERÄTE / SCHMALE DISPLAYS
+      Controls als Overlay über dem Canvas
+   ══════════════════════════════════════════════════════════ */
 @media (hover: none), (max-width: 600px) {
-  /* Show touch info on start screen, hide keyboard info */
+  /* Start-Screen: Touch-Info zeigen, Tastatur-Info verstecken */
   #keyboard-info {
     display: none !important;
   }
@@ -23,40 +102,43 @@
     display: block !important;
   }
 
-  /* Hide desktop key-legend in-game */
+  /* Key-Legend ausblenden */
   #key-legend {
     display: none;
   }
 
-  /* ── Controls bar below canvas ────────────────────────── */
+  /* ── Controls als absolutes Overlay über dem Canvas ─────── */
   #mobile-controls {
     display: flex;
+    position: absolute;
+    inset: 0; /* füllt #game-container */
+    pointer-events: none; /* Canvas bleibt klickbar durch Lücken */
+    z-index: 20;
+
+    /* D-Pad links unten, Action rechts unten */
+    align-items: flex-end;
     justify-content: space-between;
-    align-items: center;
-    width: min(720px, 100vw);
-    background: rgba(0, 0, 0, 0.55);
-    padding: clamp(8px, 2vw, 14px) clamp(12px, 4vw, 28px);
-    gap: 12px;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: none;
+    padding: clamp(8px, 2vw, 16px) clamp(10px, 3vw, 20px);
+    padding-bottom: clamp(10px, 3vw, 22px);
   }
 
-  /* ── D-Pad (left + right) ──────────────────────────────── */
+  /* ── D-Pad ─────────────────────────────────────────────── */
   .dpad {
     display: flex;
-    gap: clamp(8px, 3vw, 18px);
+    gap: clamp(6px, 2.5vw, 16px);
     align-items: center;
+    pointer-events: none;
   }
 
   .dpad-btn {
-    width: clamp(52px, 14vw, 72px);
-    height: clamp(52px, 14vw, 72px);
+    pointer-events: all; /* nur Buttons selbst abfangen */
+    width: clamp(48px, 13vw, 70px);
+    height: clamp(48px, 13vw, 70px);
     border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.35);
-    background: rgba(255, 255, 255, 0.12);
+    border: 2.5px solid rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.38);
     color: #fff;
-    font-size: clamp(20px, 5vw, 28px);
+    font-size: clamp(18px, 5vw, 26px);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -66,28 +148,34 @@
       transform 0.06s;
     -webkit-tap-highlight-color: transparent;
     touch-action: none;
+    /* Glassmorphism-Look */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   }
 
   .dpad-btn:active,
   .dpad-btn.pressed {
-    background: rgba(245, 166, 35, 0.55);
+    background: rgba(245, 166, 35, 0.6);
     border-color: #f5a623;
-    transform: scale(0.93);
+    transform: scale(0.91);
   }
 
-  /* ── Action Buttons ─────────────────────────────────────── */
+  /* ── Action-Buttons ────────────────────────────────────── */
   .action-btns {
     display: flex;
-    gap: clamp(10px, 3vw, 20px);
+    gap: clamp(6px, 2.5vw, 16px);
     align-items: center;
+    pointer-events: none;
   }
 
   .action-btn {
-    width: clamp(56px, 15vw, 76px);
-    height: clamp(56px, 15vw, 76px);
+    pointer-events: all;
+    width: clamp(52px, 14vw, 74px);
+    height: clamp(52px, 14vw, 74px);
     border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.35);
-    background: rgba(255, 255, 255, 0.12);
+    border: 2.5px solid rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.38);
     color: #fff;
     font-size: clamp(20px, 5vw, 28px);
     cursor: pointer;
@@ -99,85 +187,84 @@
       transform 0.06s;
     -webkit-tap-highlight-color: transparent;
     touch-action: none;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   }
 
-  /* Jump button – blue accent */
+  /* Springen – blau */
   .btn-jump {
-    background: rgba(40, 120, 255, 0.25);
-    border-color: rgba(80, 160, 255, 0.6);
-    font-size: clamp(22px, 5.5vw, 30px);
+    background: rgba(30, 100, 255, 0.3);
+    border-color: rgba(80, 160, 255, 0.65);
   }
   .btn-jump:active,
   .btn-jump.pressed {
-    background: rgba(40, 120, 255, 0.65);
+    background: rgba(30, 100, 255, 0.7);
     border-color: #60aaff;
-    transform: scale(0.93);
+    transform: scale(0.91);
   }
 
-  /* Throw button – orange accent */
+  /* Werfen – orange */
   .btn-throw {
-    background: rgba(220, 80, 0, 0.25);
-    border-color: rgba(255, 140, 0, 0.6);
+    background: rgba(210, 70, 0, 0.3);
+    border-color: rgba(255, 140, 0, 0.65);
   }
   .btn-throw:active,
   .btn-throw.pressed {
-    background: rgba(220, 80, 0, 0.65);
+    background: rgba(210, 70, 0, 0.7);
     border-color: #ff8c00;
-    transform: scale(0.93);
+    transform: scale(0.91);
   }
 }
 
-/* ── Extra small: 320px – 479px ─────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   4. EXTRA KLEIN: ≤ 479px
+   ══════════════════════════════════════════════════════════ */
 @media (max-width: 479px) {
   .dpad-btn {
-    width: clamp(44px, 13vw, 58px);
-    height: clamp(44px, 13vw, 58px);
-    font-size: clamp(17px, 4.5vw, 22px);
+    width: clamp(40px, 12vw, 54px);
+    height: clamp(40px, 12vw, 54px);
+    font-size: clamp(15px, 4vw, 20px);
   }
   .action-btn {
-    width: clamp(48px, 14vw, 62px);
-    height: clamp(48px, 14vw, 62px);
-    font-size: clamp(17px, 4.5vw, 22px);
+    width: clamp(44px, 13vw, 58px);
+    height: clamp(44px, 13vw, 58px);
+    font-size: clamp(15px, 4vw, 20px);
   }
   #mobile-controls {
-    padding: 6px 10px;
-    gap: 8px;
+    padding: 6px 8px 10px 8px;
   }
 }
 
-/* ── Landscape phone: controls side-by-side with canvas ─── */
-@media (max-height: 500px) and (orientation: landscape) {
+/* ══════════════════════════════════════════════════════════
+   5. LANDSCAPE PHONE  –  Controls bleiben Overlay auf Canvas
+   ══════════════════════════════════════════════════════════ */
+@media (hover: none) and (max-height: 500px) and (orientation: landscape) {
+  /* Canvas füllt volle Höhe */
   #game-wrapper {
     flex-direction: row;
-    align-items: stretch;
+    align-items: center;
     justify-content: center;
     height: 100dvh;
+    overflow: hidden;
   }
 
   #game-container {
-    /* Fill available height, keep aspect ratio */
     height: 100dvh;
     width: auto;
     aspect-ratio: 720 / 480;
     flex-shrink: 0;
   }
 
+  /* Controls bleiben Overlay – kein Layout-Shift */
   #mobile-controls {
-    flex-direction: column;
-    justify-content: space-around;
-    width: clamp(100px, 20vw, 140px);
-    height: 100dvh;
-    padding: 12px 8px;
-    background: rgba(0, 0, 0, 0.6);
+    padding: 4px 10px 8px 10px;
   }
 
-  .dpad {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .action-btns {
-    flex-direction: column;
-    gap: 10px;
+  .dpad-btn,
+  .action-btn {
+    width: clamp(36px, 9vw, 52px);
+    height: clamp(36px, 9vw, 52px);
+    font-size: clamp(13px, 3.5vw, 18px);
   }
 }
