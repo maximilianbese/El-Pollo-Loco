@@ -32,7 +32,6 @@ function startGame() {
   canvas = document.getElementById("canvas");
   world = new World(canvas, keyboard);
 
-  // Mobile-Controls neu binden (keyboard ist jetzt gesetzt)
   if (typeof initMobileControls === "function") initMobileControls();
 }
 
@@ -75,52 +74,29 @@ function toggleFullscreen() {
 }
 
 /* ── Keyboard Events ───────────────────────────────────── */
-window.addEventListener("keydown", (e) => {
-  switch (e.keyCode) {
-    case 39:
-      keyboard.RIGHT = true;
-      break;
-    case 37:
-      keyboard.LEFT = true;
-      break;
-    case 38:
-      keyboard.UP = true;
-      break;
-    case 40:
-      keyboard.DOWN = true;
-      break;
-    case 32:
-      keyboard.SPACE = true;
-      e.preventDefault();
-      break;
-    case 68:
-      keyboard.D = true;
-      break;
-    case 70:
-      toggleFullscreen();
-      break;
-  }
-});
+function handleKeyDown(e) {
+  if (e.keyCode === 32) e.preventDefault();
+  setKeyState(e.keyCode, true);
+  if (e.keyCode === 70) toggleFullscreen();
+}
 
-window.addEventListener("keyup", (e) => {
-  switch (e.keyCode) {
-    case 39:
-      keyboard.RIGHT = false;
-      break;
-    case 37:
-      keyboard.LEFT = false;
-      break;
-    case 38:
-      keyboard.UP = false;
-      break;
-    case 40:
-      keyboard.DOWN = false;
-      break;
-    case 32:
-      keyboard.SPACE = false;
-      break;
-    case 68:
-      keyboard.D = false;
-      break;
-  }
-});
+function handleKeyUp(e) {
+  setKeyState(e.keyCode, false);
+}
+
+function setKeyState(keyCode, isPressed) {
+  const keyMap = {
+    39: "RIGHT",
+    37: "LEFT",
+    38: "UP",
+    40: "DOWN",
+    32: "SPACE",
+    68: "D",
+  };
+
+  const key = keyMap[keyCode];
+  if (key) keyboard[key] = isPressed;
+}
+
+window.addEventListener("keydown", handleKeyDown);
+window.addEventListener("keyup", handleKeyUp);

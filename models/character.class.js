@@ -55,44 +55,52 @@ class Character extends MovableObject {
   }
 
   animate() {
-    // Bewegungs-Loop – 60 fps
-    setInterval(() => {
-      if (this.isDead()) return;
+    setInterval(() => this.animateMovement(), 1000 / 60);
+    setInterval(() => this.animateSprite(), 1000 / 10);
+  }
 
-      if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
-        this.moveRight();
-        this.otherDirection = false;
-      }
+  animateMovement() {
+    if (this.isDead()) return;
+    this.handleHorizontalMovement();
+    this.handleJump();
+    this.world.camera_x = -this.x + 100;
+  }
 
-      if (this.world.keyboard.LEFT && this.x > 0) {
-        this.moveLeft();
-        this.otherDirection = true;
-      }
+  handleHorizontalMovement() {
+    if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
+      this.moveRight();
+      this.otherDirection = false;
+    }
+    if (this.world.keyboard.LEFT && this.x > 0) {
+      this.moveLeft();
+      this.otherDirection = true;
+    }
+  }
 
-      if (this.world.keyboard.SPACE && !this.isAboveGround()) {
-        this.jump();
-      }
+  handleJump() {
+    if (this.world.keyboard.SPACE && !this.isAboveGround()) {
+      this.jump();
+    }
+  }
 
-      this.world.camera_x = -this.x + 100;
-    }, 1000 / 60);
+  animateSprite() {
+    if (this.isDead()) {
+      this.playAnimation(this.IMAGES_DEAD);
+      this.triggerGameOverOnce();
+    } else if (this.isHurt()) {
+      this.playAnimation(this.IMAGES_HURT);
+    } else if (this.isAboveGround()) {
+      this.playAnimation(this.IMAGES_JUMPING);
+    } else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
+      this.playAnimation(this.IMAGES_WALKING);
+    }
+  }
 
-    // Animations-Loop – 10 fps
-    setInterval(() => {
-      if (this.isDead()) {
-        this.playAnimation(this.IMAGES_DEAD);
-        if (!this.deadSoundPlayed) {
-          this.deadSoundPlayed = true;
-          // Verkürzt auf 500ms – Game Over erscheint schneller
-          setTimeout(() => showGameOver(), 500);
-        }
-      } else if (this.isHurt()) {
-        this.playAnimation(this.IMAGES_HURT);
-      } else if (this.isAboveGround()) {
-        this.playAnimation(this.IMAGES_JUMPING);
-      } else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
-        this.playAnimation(this.IMAGES_WALKING);
-      }
-    }, 1000 / 10);
+  triggerGameOverOnce() {
+    if (!this.deadSoundPlayed) {
+      this.deadSoundPlayed = true;
+      setTimeout(() => showGameOver(), 500);
+    }
   }
 
   jump() {
