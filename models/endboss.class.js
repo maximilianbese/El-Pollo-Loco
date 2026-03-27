@@ -3,7 +3,7 @@ class Endboss extends MovableObject {
   width = 250;
   y = 55;
   energy = 100;
-  speed = 2;
+  speed = 3;
   hadFirstContact = false;
   world;
 

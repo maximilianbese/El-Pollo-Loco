@@ -14,7 +14,6 @@
       href="https://fonts.googleapis.com/css2?family=Rye&display=swap"
       rel="stylesheet"
     />
-
     <link rel="icon" type="image/x-icon" href="./img/8_coin/coin_2.png" />
 
     <link rel="stylesheet" href="./style.css" />
@@ -85,6 +84,26 @@
         <div id="game-container">
           <canvas id="canvas" width="720" height="480"></canvas>
         </div>
+      </div>
+
+      <div id="game-over-screen" class="d-none end-screen">
+        <img
+          src="./img/You won, you lost/Game Over.png"
+          class="end-screen-img"
+        />
+        <button class="menu-btn restart-btn" onclick="restartGame()">
+          🔄 Neustart
+        </button>
+      </div>
+
+      <div id="win-screen" class="d-none end-screen">
+        <img
+          src="./img/You won, you lost/You Win A.png"
+          class="end-screen-img"
+        />
+        <button class="menu-btn restart-btn" onclick="restartGame()">
+          🔄 Nochmal spielen
+        </button>
       </div>
     </div>
   </body>

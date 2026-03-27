@@ -36,9 +36,7 @@ class World {
   setWorld() {
     this.character.world = this;
     this.level.enemies.forEach((enemy) => {
-      if (enemy instanceof Endboss) {
-        enemy.world = this;
-      }
+      if (enemy instanceof Endboss) enemy.world = this;
     });
   }
 
@@ -52,7 +50,22 @@ class World {
       this.checkBottlePickups();
       this.checkEndbossFirstContact();
       this.cleanupSplashedBottles();
-    }, 1000 / 60); // Spiel-Logik auf 60 FPS für flüssige Kollisionsabfrage
+      this.checkGameStatus(); // <--- Neu hinzugefügt
+    }, 1000 / 60);
+  }
+
+  // Prüft ob Pepe tot ist oder der Endboss besiegt wurde
+  checkGameStatus() {
+    if (this.character.isDead()) {
+      this.gameOver = true;
+      showGameOver(); // Funktion in game.js
+    }
+
+    const boss = this.level.enemies.find((e) => e instanceof Endboss);
+    if (boss && boss.isDead()) {
+      this.gameOver = true;
+      setTimeout(() => showWin(), 1000); // Zeige Win-Screen nach kurzem Moment
+    }
   }
 
   checkCollisions() {
@@ -62,7 +75,7 @@ class World {
           this.stompEnemy(enemy);
         } else if (!this.character.isHurt()) {
           if (enemy instanceof Endboss) {
-            this.character.energy -= 20; // 4x so viel Schaden wie normales Huhn
+            this.character.energy -= 20;
             this.character.lastHit = new Date().getTime();
           } else {
             this.character.hit();
@@ -73,7 +86,6 @@ class World {
     });
   }
 
-  /* ── Restliche Methoden (Throwing, Collectibles etc.) ── */
   canStompEnemy(enemy) {
     return (
       (enemy instanceof Chicken || enemy instanceof SmallChicken) &&
@@ -106,7 +118,7 @@ class World {
         bottle.splash();
         if (enemy instanceof Endboss) {
           this.endbossBar.setPercentage(enemy.energy);
-          enemy.x += 30; // Knockback
+          enemy.x += 30;
         }
       }
     });
@@ -125,13 +137,11 @@ class World {
   }
 
   spawnBottle() {
-    let lookingLeft = this.character.otherDirection;
-
     const xOffset = this.character.otherDirection ? -60 : 100;
     const bottle = new ThrowableObject(
       this.character.x + xOffset,
       this.character.y + 100,
-      lookingLeft, // <--- Hier geben wir die Richtung weiter!
+      this.character.otherDirection,
     );
     this.throwableObjects.push(bottle);
   }
@@ -140,7 +150,6 @@ class World {
     this.lastThrow = true;
     setTimeout(() => (this.lastThrow = false), 300);
   }
-
   cleanupSplashedBottles() {
     this.throwableObjects = this.throwableObjects.filter((b) => !b.splashDone);
   }
@@ -226,6 +235,6 @@ class World {
     }
   }
   draw() {
-    /* Draw Logik ist in world-draw.js */
+    /* In world-draw.js */
   }
 }
