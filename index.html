@@ -39,6 +39,21 @@
   <body>
     <div id="all-game-contents">
       <div id="start-screen">
+        <div id="audio-panel" class="audio-controls">
+          <button id="mute-btn" onclick="toggleMute()">
+            <span id="mute-icon">🔊</span>
+          </button>
+          <input
+            type="range"
+            id="volume-slider"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.5"
+            oninput="changeVolume(this.value)"
+          />
+        </div>
+
         <div class="start-bg">
           <img src="./img/9_intro_outro_screens/start/startscreen_1.png" />
         </div>
@@ -71,6 +86,10 @@
             <tr>
               <td class="key">F</td>
               <td>Vollbild (An/Aus)</td>
+            </tr>
+            <tr>
+              <td class="key">M</td>
+              <td>Ton (An/Aus)</td>
             </tr>
           </table>
         </div>

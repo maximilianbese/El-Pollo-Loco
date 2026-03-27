@@ -18,6 +18,9 @@ class ThrowableObject extends MovableObject {
   isSplashing = false;
   splashDone = false;
 
+  // SOUNDS
+  broken_bottle_sound = new Audio("audio/bottle_splash.mp3");
+
   constructor(x, y, isLeft) {
     super().loadImage(this.IMAGES_ROTATION[0]);
     this.loadImages(this.IMAGES_ROTATION);
@@ -26,25 +29,23 @@ class ThrowableObject extends MovableObject {
     this.y = y;
     this.height = 60;
     this.width = 50;
-    this.throw(isLeft); // Wir geben die Richtung an die throw-Funktion weiter
+    this.throw(isLeft);
   }
 
   throw(isLeft) {
     this.speedY = 30;
     this.applyGravity();
 
-    // Flugbewegung (X-Achse) basierend auf der Richtung
     this.moveInterval = setInterval(() => {
       if (!this.isSplashing) {
         if (isLeft) {
-          this.x -= 12; // Fliegt nach links
+          this.x -= 12;
         } else {
-          this.x += 12; // Fliegt nach rechts
+          this.x += 12;
         }
       }
     }, 25);
 
-    // Rotations-Animation
     this.rotationInterval = setInterval(() => {
       if (!this.isSplashing) {
         this.playAnimation(this.IMAGES_ROTATION);
@@ -56,9 +57,14 @@ class ThrowableObject extends MovableObject {
     if (this.isSplashing) return;
     this.isSplashing = true;
 
-    // Stoppe Bewegung und Rotation sofort
     clearInterval(this.moveInterval);
     clearInterval(this.rotationInterval);
+
+    // Nutzt die globale world-Variable aus game.js, um die Lautstärke zu synchronisieren
+    if (typeof world !== "undefined") {
+      this.broken_bottle_sound.volume = world.isMuted ? 0 : world.globalVolume;
+    }
+    this.broken_bottle_sound.play();
 
     let frame = 0;
     const splashInterval = setInterval(() => {

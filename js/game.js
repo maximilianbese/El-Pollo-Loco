@@ -3,6 +3,10 @@ let world;
 let keyboard = new Keyboard();
 let globalIntervals = [];
 
+// Globale Audio-Werte zum Zwischenspeichern der Slider-Einstellung
+let currentVolume = 0.5;
+let isMuted = false;
+
 const _origSetInterval = window.setInterval;
 window.setInterval = function (fn, delay) {
   const id = _origSetInterval(fn, delay);
@@ -25,27 +29,31 @@ function startGame() {
   document.getElementById("game-wrapper").style.display = "flex";
   canvas = document.getElementById("canvas");
 
-  // Nutzt deine neue Funktion aus level1.js
   if (typeof createLevel1 === "function") createLevel1();
 
   world = new World(canvas, keyboard);
+
+  // Einstellungen aus dem Startmenü auf die neue Welt übertragen
+  world.isMuted = isMuted;
+  world.globalVolume = currentVolume;
+  world.applyVolume();
 }
 
 function restartGame() {
-  // Beide End-Screens verstecken
   document.getElementById("game-over-screen").classList.add("d-none");
   document.getElementById("win-screen").classList.add("d-none");
 
-  // Alle laufenden Intervalle stoppen
-  clearAllIntervals();
+  // Audio-Status der alten Welt merken
+  let lastVol = world.globalVolume;
+  let lastMute = world.isMuted;
 
-  // 1. Level-Objekte (Gegner, Items) neu erstellen
+  clearAllIntervals();
   if (typeof createLevel1 === "function") createLevel1();
 
-  // 2. Neue Welt-Instanz erstellen (setzt Pepe, Bars etc. zurück)
   world = new World(canvas, keyboard);
-
-  // 3. Kamera manuell auf Startposition setzen
+  world.globalVolume = lastVol;
+  world.isMuted = lastMute;
+  world.applyVolume();
   world.camera_x = 0;
 }
 
@@ -57,6 +65,21 @@ function showGameOver() {
 function showWin() {
   document.getElementById("win-screen").classList.remove("d-none");
   clearAllIntervals();
+}
+
+function toggleMute() {
+  isMuted = !isMuted;
+  if (world) {
+    world.toggleMute();
+  }
+  document.getElementById("mute-icon").innerText = isMuted ? "🔇" : "🔊";
+}
+
+function changeVolume(value) {
+  currentVolume = parseFloat(value);
+  if (world) {
+    world.setVolume(currentVolume);
+  }
 }
 
 function toggleFullscreen() {
@@ -72,6 +95,7 @@ window.addEventListener("keydown", (e) => {
   if (e.keyCode === 32) e.preventDefault();
   setKeyState(e.keyCode, true);
   if (e.keyCode === 70) toggleFullscreen();
+  if (e.keyCode === 77) toggleMute();
 });
 
 window.addEventListener("keyup", (e) => setKeyState(e.keyCode, false));
@@ -84,6 +108,7 @@ function setKeyState(keyCode, isPressed) {
     40: "DOWN",
     32: "SPACE",
     68: "D",
+    77: "M",
   };
   const key = keyMap[keyCode];
   if (key) keyboard[key] = isPressed;

@@ -69,6 +69,11 @@ class Character extends MovableObject {
 
   lastActionTime = new Date().getTime();
 
+  // SOUNDS
+  walking_sound = new Audio("audio/walking.mp3");
+  jump_sound = new Audio("audio/jump.mp3");
+  hurt_sound = new Audio("audio/hurt.mp3");
+
   constructor() {
     super().loadImage("img/2_character_pepe/1_idle/idle/I-1.png");
     this.loadImages(this.IMAGES_WALKING);
@@ -82,45 +87,75 @@ class Character extends MovableObject {
   }
 
   animate() {
-    // Intervall für die physikalische Bewegung (60 FPS)
     setInterval(() => {
       this.moveCharacter();
     }, 1000 / 60);
 
-    // Intervall für Animationen
     setInterval(() => {
       this.playCharacterAnimations();
     }, 150);
   }
 
   moveCharacter() {
-    // 1. DER FIX: Wenn Pepe tot ist, wird der Rest der Funktion ignoriert.
     if (this.isDead()) {
+      this.walking_sound.pause();
       return;
     }
 
-    // Bewegung nach Rechts
+    let isMoving = false;
+
     if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
       this.moveRight();
       this.otherDirection = false;
       this.resetIdleTimer();
+      isMoving = true;
     }
 
-    // Bewegung nach Links
     if (this.world.keyboard.LEFT && this.x > 0) {
       this.moveLeft();
       this.otherDirection = true;
       this.resetIdleTimer();
+      isMoving = true;
     }
 
-    // Springen
+    // --- Gehen Sound Logik ---
+    if (isMoving && !this.isAboveGround()) {
+      this.playWalkingSound();
+    } else {
+      this.walking_sound.pause();
+    }
+
+    // --- Springen Logik ---
     if (this.world.keyboard.SPACE && !this.isAboveGround()) {
       this.jump();
+      this.world.playAudio(this.jump_sound);
       this.resetIdleTimer();
     }
 
-    // Kamera-Fokus (sollte auch bei Tod stoppen oder fix bleiben)
     this.world.camera_x = -this.x + 100;
+  }
+
+  /**
+   * Spielt den Walking-Sound nur ab, wenn er nicht bereits läuft.
+   * Das verhindert das "Stottern" bei 60 FPS.
+   */
+  playWalkingSound() {
+    this.walking_sound.volume = this.world.isMuted
+      ? 0
+      : this.world.globalVolume;
+    if (this.walking_sound.paused) {
+      this.walking_sound.play().catch((e) => {});
+    }
+  }
+
+  hit() {
+    this.energy -= 5;
+    if (this.energy < 0) {
+      this.energy = 0;
+    } else {
+      this.lastHit = new Date().getTime();
+      this.world.playAudio(this.hurt_sound);
+    }
   }
 
   resetIdleTimer() {
@@ -130,6 +165,7 @@ class Character extends MovableObject {
   playCharacterAnimations() {
     if (this.isDead()) {
       this.playAnimation(this.IMAGES_DEAD);
+      this.hurt_sound.pause();
     } else if (this.isHurt()) {
       this.playAnimation(this.IMAGES_HURT);
       this.resetIdleTimer();

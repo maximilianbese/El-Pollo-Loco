@@ -58,31 +58,23 @@ canvas,
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.85); /* Etwas dunkler für besseren Fokus */
+  background-color: rgba(0, 0, 0, 0.85);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 999; /* Extrem hoch, damit es über ALLEM liegt */
+  z-index: 999;
 }
 
 .end-screen-img {
-  max-width: 70%; /* Etwas kleiner, damit Platz für den Button bleibt */
-  max-height: 50%; /* Verhindert, dass das Bild den Button verdrängt */
+  max-width: 70%;
+  max-height: 50%;
   object-fit: contain;
-  margin-bottom: 30px; /* Mehr Platz zum Button */
+  margin-bottom: 30px;
 }
 
-/* Spezifisches Styling für den Restart-Button auf den End-Screens */
 .end-screen .restart-btn {
-  position: relative; /* Stellt sicher, dass er über dem Hintergrund-Div liegt */
-  z-index: 1000;
-  padding: 15px 40px;
-  font-size: 24px;
-  min-width: 200px;
-}
-.end-screen .restart-btn {
-  position: relative; /* Stellt sicher, dass er über dem Hintergrund-Div liegt */
+  position: relative;
   z-index: 1000;
   padding: 15px 40px;
   font-size: 24px;
@@ -115,6 +107,7 @@ canvas,
   transform: translateY(2px);
   box-shadow: 0 2px #bf360c;
 }
+
 .start-btn {
   background-color: #ff9800;
 }
@@ -150,6 +143,7 @@ canvas,
   font-size: 20px;
   cursor: pointer;
 }
+
 .key {
   color: #ff9800;
   font-weight: bold;
@@ -157,6 +151,35 @@ canvas,
 }
 .d-none {
   display: none !important;
+}
+
+/* ══ AUDIO CONTROLS (NEU) ══ */
+.audio-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid #ff9800;
+}
+
+#mute-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+#volume-slider {
+  width: 80px;
+  cursor: pointer;
+  accent-color: #ff9800;
 }
 
 /* ══ VOLLBILD ══════════════════════════════════════════════ */
