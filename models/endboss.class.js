@@ -48,7 +48,12 @@ class Endboss extends MovableObject {
     this.loadImages(this.IMAGES_DEAD);
     this.x = 2500;
     this.animate();
-    this.offset = { top: 60, bottom: 20, left: 40, right: 40 };
+    this.offset = {
+      top: 50,
+      bottom: 10,
+      left: 40, // Erhöhe diesen Wert, damit Pepe näher ran kann
+      right: 40, // Erhöhe diesen Wert ebenfalls
+    };
   }
 
   animate() {
@@ -58,7 +63,7 @@ class Endboss extends MovableObject {
 
       let distance =
         this.x - (this.world.character.x + this.world.character.width);
-      if (distance > 30) {
+      if (distance > -100) {
         this.moveLeft(); // Nutzt jetzt den Speed von 5 flüssig
       }
     }, 1000 / 60);
