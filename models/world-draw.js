@@ -31,7 +31,7 @@ World.prototype.drawHUD = function () {
   this.addToMap(this.bottleBar);
   this.addToMap(this.coinBar);
   this.drawEndbossHUD();
-  this.drawFSButton();
+  //this.drawFSButton();//
 };
 
 World.prototype.drawEndbossHUD = function () {

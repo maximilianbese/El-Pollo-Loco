@@ -4,9 +4,6 @@ class Character extends MovableObject {
   y = 145;
   speed = 3;
 
-  // Timer für die Inaktivität
-  idleTimer = 0;
-
   IMAGES_WALKING = [
     "img/2_character_pepe/2_walk/W-21.png",
     "img/2_character_pepe/2_walk/W-22.png",
@@ -16,7 +13,6 @@ class Character extends MovableObject {
     "img/2_character_pepe/2_walk/W-26.png",
   ];
 
-  // Normale Idle Animation (Atmen/Stehen)
   IMAGES_IDLE = [
     "img/2_character_pepe/1_idle/idle/I-1.png",
     "img/2_character_pepe/1_idle/idle/I-2.png",
@@ -30,7 +26,6 @@ class Character extends MovableObject {
     "img/2_character_pepe/1_idle/idle/I-10.png",
   ];
 
-  // Lange Idle Animation (Schlafen)
   IMAGES_LONG_IDLE = [
     "img/2_character_pepe/1_idle/long_idle/I-11.png",
     "img/2_character_pepe/1_idle/long_idle/I-12.png",
@@ -61,6 +56,7 @@ class Character extends MovableObject {
     "img/2_character_pepe/4_hurt/H-42.png",
     "img/2_character_pepe/4_hurt/H-43.png",
   ];
+
   IMAGES_DEAD = [
     "img/2_character_pepe/5_dead/D-51.png",
     "img/2_character_pepe/5_dead/D-52.png",
@@ -71,7 +67,7 @@ class Character extends MovableObject {
     "img/2_character_pepe/5_dead/D-57.png",
   ];
 
-  lastActionTime = new Date().getTime(); // Speichert den exakten Zeitpunkt der letzten Bewegung
+  lastActionTime = new Date().getTime();
 
   constructor() {
     super().loadImage("img/2_character_pepe/1_idle/idle/I-1.png");
@@ -86,44 +82,44 @@ class Character extends MovableObject {
   }
 
   animate() {
-    // 60 FPS: Nur für die Bewegung
+    // Intervall für die physikalische Bewegung (60 FPS)
     setInterval(() => {
       this.moveCharacter();
     }, 1000 / 60);
 
-    // Separates Intervall für Animationen (etwas langsamer für Idle)
+    // Intervall für Animationen
     setInterval(() => {
       this.playCharacterAnimations();
     }, 150);
   }
 
   moveCharacter() {
-    if (this.isDead()) return;
-
-    // Prüfen, ob irgendeine Taste gedrückt wird
-    if (
-      this.world.keyboard.RIGHT ||
-      this.world.keyboard.LEFT ||
-      this.world.keyboard.SPACE ||
-      this.world.keyboard.D
-    ) {
-      this.resetIdleTimer();
+    // 1. DER FIX: Wenn Pepe tot ist, wird der Rest der Funktion ignoriert.
+    if (this.isDead()) {
+      return;
     }
 
+    // Bewegung nach Rechts
     if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
       this.moveRight();
       this.otherDirection = false;
+      this.resetIdleTimer();
     }
 
+    // Bewegung nach Links
     if (this.world.keyboard.LEFT && this.x > 0) {
       this.moveLeft();
       this.otherDirection = true;
+      this.resetIdleTimer();
     }
 
+    // Springen
     if (this.world.keyboard.SPACE && !this.isAboveGround()) {
       this.jump();
+      this.resetIdleTimer();
     }
 
+    // Kamera-Fokus (sollte auch bei Tod stoppen oder fix bleiben)
     this.world.camera_x = -this.x + 100;
   }
 
@@ -136,10 +132,9 @@ class Character extends MovableObject {
       this.playAnimation(this.IMAGES_DEAD);
     } else if (this.isHurt()) {
       this.playAnimation(this.IMAGES_HURT);
-      this.resetIdleTimer(); // Auch bei Schaden wird er "wach"
+      this.resetIdleTimer();
     } else if (this.isAboveGround()) {
       this.playAnimation(this.IMAGES_JUMPING);
-      this.resetIdleTimer();
     } else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
       this.playAnimation(this.IMAGES_WALKING);
     } else {
@@ -149,10 +144,9 @@ class Character extends MovableObject {
 
   handleIdleStates() {
     let now = new Date().getTime();
-    let timePassed = now - this.lastActionTime; // Zeit in Millisekunden
+    let timePassed = now - this.lastActionTime;
 
     if (timePassed >= 3000) {
-      // Exakt 5 Sekunden
       this.playAnimation(this.IMAGES_LONG_IDLE);
     } else {
       this.playAnimation(this.IMAGES_IDLE);

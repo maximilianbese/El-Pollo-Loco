@@ -7,9 +7,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no"
     />
     <title>El Pollo Loco</title>
-    <link rel="icon" type="image/x-icon" href="img/8_coin/coin_2.png" />
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -17,11 +15,11 @@
       rel="stylesheet"
     />
 
-    <!-- Styles -->
+    <link rel="icon" type="image/x-icon" href="./img/8_coin/coin_2.png" />
+
     <link rel="stylesheet" href="./style.css" />
     <link rel="stylesheet" href="./mobile.css" />
 
-    <!-- Game classes -->
     <script src="./models/drawable-object.class.js"></script>
     <script src="./models/moveable-object.class.js"></script>
     <script src="./models/character.class.js"></script>
@@ -38,144 +36,56 @@
     <script src="./models/endboss.class.js"></script>
     <script src="./models/world.class.js"></script>
     <script src="./models/world-draw.js"></script>
-
-    <!-- Level + Game logic -->
     <script src="./levels/level1.js"></script>
     <script src="./models/mobile-controls.js"></script>
     <script src="./js/game.js"></script>
   </head>
   <body>
-    <!-- ══ ROTATE DEVICE OVERLAY (Hochformat auf mobil) ════════════════ -->
-    <div id="rotate-overlay" aria-live="polite">
-      <div class="rotate-content">
-        <div class="rotate-icon">📱</div>
-        <div class="rotate-arrow">↻</div>
-        <p>Bitte drehe dein Gerät</p>
-        <p class="rotate-sub">
-          Das Spiel läuft nur im <strong>Querformat</strong>
-        </p>
-      </div>
-    </div>
-
-    <!-- ══ START SCREEN ══════════════════════════════════════════════════ -->
-    <div id="start-screen">
-      <div class="start-bg">
-        <img
-          src="./img/9_intro_outro_screens/start/startscreen_1.png"
-          alt="El Pollo Loco"
-        />
-      </div>
-      <div class="start-overlay">
-        <!-- Desktop-Hinweis -->
-        <div class="key-info" id="keyboard-info">
-          <h2>🎮 Tastatur</h2>
-          <table>
-            <tr>
-              <td>⬅ ➡</td>
-              <td>Bewegen</td>
-            </tr>
-            <tr>
-              <td>⎵</td>
-              <td>Springen</td>
-            </tr>
-            <tr>
-              <td>D</td>
-              <td>Flasche werfen</td>
-            </tr>
-            <tr>
-              <td>F</td>
-              <td>Vollbild</td>
-            </tr>
-          </table>
+    <div id="all-game-contents">
+      <div id="start-screen">
+        <div class="start-bg">
+          <img src="./img/9_intro_outro_screens/start/startscreen_1.png" />
+        </div>
+        <div class="start-overlay">
+          <div class="start-buttons">
+            <button class="menu-btn start-btn" onclick="startGame()">
+              ▶ Spiel starten
+            </button>
+            <button class="menu-btn info-btn" onclick="toggleControls()">
+              🎮 Steuerung
+            </button>
+          </div>
         </div>
 
-        <!-- Mobile-Hinweis -->
-        <div class="key-info" id="touch-info">
-          <h2>👆 Touch</h2>
+        <div id="controls-panel" class="d-none">
+          <button class="close-btn" onclick="toggleControls()">✖</button>
+          <h2>Steuerung</h2>
           <table>
             <tr>
-              <td>◀ ▶</td>
+              <td class="key">⬅ ➡</td>
               <td>Bewegen</td>
             </tr>
             <tr>
-              <td>⬆</td>
+              <td class="key">⎵</td>
               <td>Springen</td>
             </tr>
             <tr>
-              <td>🍾</td>
+              <td class="key">D</td>
               <td>Werfen</td>
             </tr>
+            <tr>
+              <td class="key">F</td>
+              <td>Vollbild (An/Aus)</td>
+            </tr>
           </table>
         </div>
+      </div>
 
-        <div class="start-buttons">
-          <button id="start-btn" onclick="startGame()">▶ Spiel starten</button>
-          <button id="fullscreen-btn" onclick="toggleFullscreen()">
-            ⛶ Vollbild
-          </button>
+      <div id="game-wrapper" style="display: none">
+        <div id="game-container">
+          <canvas id="canvas" width="720" height="480"></canvas>
         </div>
       </div>
     </div>
-
-    <!-- ══ GAME WRAPPER ══════════════════════════════════════════════════ -->
-    <div id="game-wrapper" style="display: none">
-      <div id="game-container">
-        <canvas id="canvas" width="720" height="480"></canvas>
-
-        <!-- Game Over Overlay -->
-        <div id="game-over-screen" style="display: none">
-          <img
-            src="./img/You won, you lost/Game Over.png"
-            alt="Game Over"
-            class="screen-img"
-          />
-          <button onclick="restartGame()">🔄 Neu starten</button>
-        </div>
-
-        <!-- Win Overlay -->
-        <div id="win-screen" style="display: none">
-          <img
-            src="./img/You won, you lost/You Win A.png"
-            alt="You Win!"
-            class="screen-img"
-          />
-          <button onclick="restartGame()">🔄 Nochmal spielen</button>
-        </div>
-
-        <!-- Desktop Key-Legend -->
-        <div id="key-legend">
-          ⬅➡ Bewegen &nbsp;|&nbsp; ⎵ Springen &nbsp;|&nbsp; D Werfen
-          &nbsp;|&nbsp; F Vollbild
-        </div>
-
-        <!-- ── Mobile Controls (overlay auf dem Canvas) ──────────────── -->
-        <div id="mobile-controls">
-          <div class="dpad">
-            <button class="dpad-btn" id="btn-left" aria-label="Links">◀</button>
-            <button class="dpad-btn" id="btn-right" aria-label="Rechts">
-              ▶
-            </button>
-          </div>
-          <div class="action-btns">
-            <button
-              class="action-btn btn-jump"
-              id="btn-jump"
-              aria-label="Springen"
-            >
-              ⬆
-            </button>
-            <button
-              class="action-btn btn-throw"
-              id="btn-throw"
-              aria-label="Werfen"
-            >
-              🍾
-            </button>
-          </div>
-        </div>
-      </div>
-      <!-- /game-container -->
-    </div>
-    <!-- /game-wrapper -->
   </body>
 </html>
