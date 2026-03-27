@@ -7,9 +7,10 @@ body {
   height: 100vh;
   background-color: #2c3e50;
   font-family: "Rye", cursive;
-  overflow: hidden;
+  overflow: hidden; /* Verhindert Scrollen komplett */
   background-image: url(./img/5_background/website-background.jpg);
   background-size: cover;
+  background-position: center;
 }
 
 /* ══ MASTER CONTAINER ══════════════════════════════════════ */
@@ -24,6 +25,8 @@ body {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.7);
+  z-index: 5;
 }
 
 /* ══ ELEMENTE ══════════════════════════════════════════════ */
@@ -73,14 +76,6 @@ canvas,
   margin-bottom: 30px;
 }
 
-.end-screen .restart-btn {
-  position: relative;
-  z-index: 1000;
-  padding: 15px 40px;
-  font-size: 24px;
-  min-width: 200px;
-}
-
 .start-overlay {
   position: absolute;
   bottom: 40px;
@@ -90,6 +85,7 @@ canvas,
   z-index: 10;
 }
 
+/* ══ BUTTONS ═══════════════════════════════════════════════ */
 .menu-btn {
   padding: 10px 20px;
   font-size: 18px;
@@ -120,12 +116,13 @@ canvas,
   box-shadow: 0 4px #b71c1c;
 }
 
+/* ══ CONTROLS PANEL ════════════════════════════════════════ */
 #controls-panel {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.95);
   padding: 20px;
   border: 2px solid #ff9800;
   border-radius: 10px;
@@ -153,7 +150,7 @@ canvas,
   display: none !important;
 }
 
-/* ══ AUDIO CONTROLS (NEU) ══ */
+/* ══ AUDIO CONTROLS ══ */
 .audio-controls {
   position: absolute;
   top: 10px;
@@ -175,11 +172,34 @@ canvas,
   font-size: 18px;
   margin-right: 8px;
 }
-
 #volume-slider {
   width: 80px;
   cursor: pointer;
   accent-color: #ff9800;
+}
+
+/* ══ FOOTER (KEIN SCROLLEN) ════════════════════════════════ */
+.footer-fixed {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 1;
+}
+
+.legal-link {
+  color: rgb(0, 0, 0);
+  text-decoration: none;
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  transition: all 0.2s;
+  padding: 5px 10px;
+}
+
+.legal-link:hover {
+  color: #ff0000;
+  text-shadow: 0 0 5px rgba(255, 152, 0, 0.5);
 }
 
 /* ══ VOLLBILD ══════════════════════════════════════════════ */
@@ -189,6 +209,7 @@ canvas,
   border: none;
   border-radius: 0;
 }
-#all-game-contents:fullscreen canvas {
-  object-fit: contain;
+
+#all-game-contents:fullscreen ~ .footer-fixed {
+  display: none; /* Im Vollbild verstecken */
 }
