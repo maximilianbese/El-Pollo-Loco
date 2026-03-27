@@ -18,7 +18,7 @@ class ThrowableObject extends MovableObject {
   isSplashing = false;
   splashDone = false;
 
-  constructor(x, y) {
+  constructor(x, y, isLeft) {
     super().loadImage(this.IMAGES_ROTATION[0]);
     this.loadImages(this.IMAGES_ROTATION);
     this.loadImages(this.IMAGES_SPLASH);
@@ -26,19 +26,25 @@ class ThrowableObject extends MovableObject {
     this.y = y;
     this.height = 60;
     this.width = 50;
-    this.throw();
+    this.throw(isLeft); // Wir geben die Richtung an die throw-Funktion weiter
   }
 
-  throw() {
+  throw(isLeft) {
     this.speedY = 30;
     this.applyGravity();
 
-    // Move right
+    // Flugbewegung (X-Achse) basierend auf der Richtung
     this.moveInterval = setInterval(() => {
-      if (!this.isSplashing) this.x += 10;
+      if (!this.isSplashing) {
+        if (isLeft) {
+          this.x -= 12; // Fliegt nach links
+        } else {
+          this.x += 12; // Fliegt nach rechts
+        }
+      }
     }, 25);
 
-    // Rotation animation
+    // Rotations-Animation
     this.rotationInterval = setInterval(() => {
       if (!this.isSplashing) {
         this.playAnimation(this.IMAGES_ROTATION);
@@ -49,13 +55,16 @@ class ThrowableObject extends MovableObject {
   splash() {
     if (this.isSplashing) return;
     this.isSplashing = true;
+
+    // Stoppe Bewegung und Rotation sofort
     clearInterval(this.moveInterval);
     clearInterval(this.rotationInterval);
 
     let frame = 0;
     const splashInterval = setInterval(() => {
       if (frame < this.IMAGES_SPLASH.length) {
-        this.img = this.imageCache[this.IMAGES_SPLASH[frame]];
+        let path = this.IMAGES_SPLASH[frame];
+        this.img = this.imageCache[path];
         frame++;
       } else {
         clearInterval(splashInterval);

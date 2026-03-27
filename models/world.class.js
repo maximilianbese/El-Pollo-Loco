@@ -125,10 +125,13 @@ class World {
   }
 
   spawnBottle() {
+    let lookingLeft = this.character.otherDirection;
+
     const xOffset = this.character.otherDirection ? -60 : 100;
     const bottle = new ThrowableObject(
       this.character.x + xOffset,
       this.character.y + 100,
+      lookingLeft, // <--- Hier geben wir die Richtung weiter!
     );
     this.throwableObjects.push(bottle);
   }
