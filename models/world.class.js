@@ -35,9 +35,13 @@ class World {
 
   setWorld() {
     this.character.world = this;
+    this.level.enemies.forEach((enemy) => {
+      if (enemy instanceof Endboss) {
+        enemy.world = this;
+      }
+    });
   }
 
-  /* ── Game Loop ─────────────────────────────────────────── */
   run() {
     setInterval(() => {
       if (this.gameOver) return;
@@ -48,10 +52,66 @@ class World {
       this.checkBottlePickups();
       this.checkEndbossFirstContact();
       this.cleanupSplashedBottles();
-    }, 200);
+    }, 1000 / 60); // Spiel-Logik auf 60 FPS für flüssige Kollisionsabfrage
   }
 
-  /* ── Throwing ──────────────────────────────────────────── */
+  checkCollisions() {
+    this.level.enemies.forEach((enemy) => {
+      if (this.character.isColliding(enemy) && !enemy.isDead()) {
+        if (this.canStompEnemy(enemy)) {
+          this.stompEnemy(enemy);
+        } else if (!this.character.isHurt()) {
+          if (enemy instanceof Endboss) {
+            this.character.energy -= 20; // 4x so viel Schaden wie normales Huhn
+            this.character.lastHit = new Date().getTime();
+          } else {
+            this.character.hit();
+          }
+          this.healthBar.setPercentage(this.character.energy);
+        }
+      }
+    });
+  }
+
+  /* ── Restliche Methoden (Throwing, Collectibles etc.) ── */
+  canStompEnemy(enemy) {
+    return (
+      (enemy instanceof Chicken || enemy instanceof SmallChicken) &&
+      this.character.isAboveGround() &&
+      this.character.speedY <= 0.5 &&
+      this.character.y + this.character.height > enemy.y
+    );
+  }
+
+  stompEnemy(enemy) {
+    enemy.energy = 0;
+    this.character.speedY = 15;
+  }
+
+  checkBottleCollisions() {
+    this.throwableObjects.forEach((bottle) => {
+      if (bottle.isSplashing || bottle.splashDone) return;
+      if (bottle.y >= 370) {
+        bottle.splash();
+        return;
+      }
+      this.checkBottleHitsEnemy(bottle);
+    });
+  }
+
+  checkBottleHitsEnemy(bottle) {
+    this.level.enemies.forEach((enemy) => {
+      if (!enemy.isDead() && bottle.isColliding(enemy)) {
+        enemy.hit();
+        bottle.splash();
+        if (enemy instanceof Endboss) {
+          this.endbossBar.setPercentage(enemy.energy);
+          enemy.x += 30; // Knockback
+        }
+      }
+    });
+  }
+
   checkThrowObjects() {
     if (!this.canThrow()) return;
     this.bottleCount--;
@@ -78,65 +138,10 @@ class World {
     setTimeout(() => (this.lastThrow = false), 300);
   }
 
-  /* ── Collisions ────────────────────────────────────────── */
-  checkCollisions() {
-    this.level.enemies.forEach((enemy) => {
-      if (this.character.isColliding(enemy) && !enemy.isDead()) {
-        // Wir nutzen deine vorbereitete Funktion!
-        if (this.canStompEnemy(enemy)) {
-          this.stompEnemy(enemy);
-        }
-        // Nur wenn er NICHT stompt und Pepe nicht gerade unverwundbar ist (isHurt)
-        else if (!this.character.isHurt() && !enemy.isDead()) {
-          this.character.hit();
-          this.healthBar.setPercentage(this.character.energy);
-        }
-      }
-    });
-  }
-
-  canStompEnemy(enemy) {
-    return (
-      (enemy instanceof Chicken || enemy instanceof SmallChicken) &&
-      this.character.isAboveGround() &&
-      this.character.speedY <= 0.5 && // Erhöhte Toleranz: zählt auch kurz vor dem Sinken
-      this.character.y + this.character.height > enemy.y // Pepe muss über der Oberkante des Gegners sein
-    );
-  }
-
-  stompEnemy(enemy) {
-    enemy.energy = 0; // Setzt Energie auf 0, damit isDead() true wird
-    this.character.speedY = 15; // Pepe hüpft nach dem Treffer wieder hoch
-  }
-
-  /* ── Bottle Collisions ─────────────────────────────────── */
-  checkBottleCollisions() {
-    this.throwableObjects.forEach((bottle) => {
-      if (bottle.isSplashing || bottle.splashDone) return;
-      if (bottle.y >= 370) {
-        bottle.splash();
-        return;
-      }
-      this.checkBottleHitsEnemy(bottle);
-    });
-  }
-
-  checkBottleHitsEnemy(bottle) {
-    this.level.enemies.forEach((enemy) => {
-      if (!enemy.isDead() && bottle.isColliding(enemy)) {
-        enemy.hit();
-        bottle.splash();
-        if (enemy instanceof Endboss)
-          this.endbossBar.setPercentage(enemy.energy);
-      }
-    });
-  }
-
   cleanupSplashedBottles() {
     this.throwableObjects = this.throwableObjects.filter((b) => !b.splashDone);
   }
 
-  /* ── Collectibles ──────────────────────────────────────── */
   checkCoinCollections() {
     this.level.coins.forEach((coin, i) => {
       if (this.character.isColliding(coin)) this.collectCoin(i);
@@ -168,7 +173,6 @@ class World {
     this.level.bottlesOnGround.splice(index, 1);
   }
 
-  /* ── Endboss Contact ───────────────────────────────────── */
   checkEndbossFirstContact() {
     this.level.enemies.forEach((enemy) => {
       if (
@@ -182,7 +186,6 @@ class World {
     });
   }
 
-  /* ── Endboss Intro State ───────────────────────────────── */
   triggerEndbossIntro() {
     if (this.endbossIntroDone) return;
     this.endbossIntroActive = true;
@@ -206,19 +209,20 @@ class World {
       this.introTimer = 0;
     }
   }
-
   updateIntroHold() {
     if (this.introTimer > 70) {
       this.introPhase = "out";
       this.introTimer = 0;
     }
   }
-
   updateIntroFadeOut() {
     this.introAlpha = Math.max(this.introAlpha - 0.04, 0);
     if (this.introAlpha <= 0) {
       this.endbossIntroActive = false;
       this.endbossIntroDone = true;
     }
+  }
+  draw() {
+    /* Draw Logik ist in world-draw.js */
   }
 }

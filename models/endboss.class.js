@@ -3,8 +3,9 @@ class Endboss extends MovableObject {
   width = 250;
   y = 55;
   energy = 100;
-  speed = 0.8;
+  speed = 2;
   hadFirstContact = false;
+  world;
 
   IMAGES_ALERT = [
     "img/4_enemie_boss_chicken/2_alert/G5.png",
@@ -47,45 +48,65 @@ class Endboss extends MovableObject {
     this.loadImages(this.IMAGES_DEAD);
     this.x = 2500;
     this.animate();
+    this.offset = { top: 60, bottom: 20, left: 40, right: 40 };
   }
 
   animate() {
+    // 1. Logik & Bewegung (60 FPS für maximale Flüssigkeit)
+    setInterval(() => {
+      if (this.isDead() || !this.hadFirstContact || !this.world) return;
+
+      let distance =
+        this.x - (this.world.character.x + this.world.character.width);
+      if (distance > 30) {
+        this.moveLeft(); // Nutzt jetzt den Speed von 5 flüssig
+      }
+    }, 1000 / 60);
+
+    // 2. Animation / Bilderwechsel
     setInterval(() => {
       if (this.isDead()) {
         this.animateDead();
+      } else if (this.isHurt()) {
+        this.playAnimation(this.IMAGES_HURT);
       } else {
-        this.animateAlive();
+        this.checkStateAndPlayAnim();
       }
-    }, 200);
+    }, 150); // Etwas schnellerer Bilderwechsel für den Speed
+  }
+
+  checkStateAndPlayAnim() {
+    if (this.hadFirstContact && this.world) {
+      let distance =
+        this.x - (this.world.character.x + this.world.character.width);
+      if (distance > 30) {
+        this.playAnimation(this.IMAGES_WALKING);
+      } else {
+        this.playAnimation(this.IMAGES_ALERT);
+      }
+    }
   }
 
   animateDead() {
     if (this.deadAnimDone) return;
-
-    const path = this.IMAGES_DEAD[this.deadFrameIndex];
-    this.img = this.imageCache[path];
-    this.deadFrameIndex++;
-
-    if (this.deadFrameIndex >= this.IMAGES_DEAD.length) {
-      this.deadAnimDone = true;
-      setTimeout(() => showWinScreen(), 800);
-    }
-  }
-
-  animateAlive() {
-    if (this.isHurt()) {
-      this.playAnimation(this.IMAGES_HURT);
-    } else if (this.hadFirstContact) {
-      this.playAnimation(this.IMAGES_WALKING);
-      this.moveLeft();
+    if (this.deadFrameIndex < this.IMAGES_DEAD.length) {
+      let path = this.IMAGES_DEAD[this.deadFrameIndex];
+      this.img = this.imageCache[path];
+      this.deadFrameIndex++;
     } else {
-      this.playAnimation(this.IMAGES_ALERT);
+      this.deadAnimDone = true;
+      setTimeout(() => showWinScreen(), 500);
     }
   }
 
   hit() {
     this.energy -= 20;
-    if (this.energy < 0) this.energy = 0;
-    this.lastHit = new Date().getTime();
+    if (this.energy < 0) {
+      this.energy = 0;
+    } else {
+      this.lastHit = new Date().getTime();
+      // Bei Speed 5 ist er schon extrem schnell, hier nur kleine Steigerung
+      this.speed += 0.2;
+    }
   }
 }
