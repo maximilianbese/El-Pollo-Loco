@@ -19,7 +19,7 @@ body {
   justify-content: center;
   min-height: 100vh;
   min-height: 100dvh; /* dynamic viewport on mobile */
-  background-image: url("../img/5_background/website-background.jpg");
+  background-image: url("img/5_background/website-background.jpg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
