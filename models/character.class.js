@@ -48,15 +48,15 @@ class Character extends MovableObject {
   ];
 
   IMAGES_JUMPING = [
-    "img/2_character_pepe/3_jump/J-31.png",
-    "img/2_character_pepe/3_jump/J-32.png",
-    "img/2_character_pepe/3_jump/J-33.png",
-    "img/2_character_pepe/3_jump/J-34.png",
-    "img/2_character_pepe/3_jump/J-35.png",
-    "img/2_character_pepe/3_jump/J-36.png",
-    "img/2_character_pepe/3_jump/J-37.png",
-    "img/2_character_pepe/3_jump/J-38.png",
-    "img/2_character_pepe/3_jump/J-39.png",
+    "img/2_character_pepe/3_jump/J-31.png", // [0] Start
+    "img/2_character_pepe/3_jump/J-32.png", // [1]
+    "img/2_character_pepe/3_jump/J-33.png", // [2]
+    "img/2_character_pepe/3_jump/J-34.png", // [3]
+    "img/2_character_pepe/3_jump/J-35.png", // [4] Oben
+    "img/2_character_pepe/3_jump/J-36.png", // [5]
+    "img/2_character_pepe/3_jump/J-37.png", // [6]
+    "img/2_character_pepe/3_jump/J-38.png", // [7]
+    "img/2_character_pepe/3_jump/J-39.png", // [8] Landung
   ];
 
   IMAGES_HURT = [
@@ -100,7 +100,7 @@ class Character extends MovableObject {
 
     setInterval(() => {
       this.playCharacterAnimations();
-    }, 150);
+    }, 100); // Auf 100ms verkürzt für schnellere Reaktionszeit
   }
 
   moveCharacter() {
@@ -171,12 +171,31 @@ class Character extends MovableObject {
       this.playAnimation(this.IMAGES_HURT);
       this.resetIdleTimer();
     } else if (this.isAboveGround()) {
-      this.playAnimation(this.IMAGES_JUMPING);
+      this.playJumpAnimation(); // Neue Logik für flüssige Sprünge
     } else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
       this.playAnimation(this.IMAGES_WALKING);
     } else {
       this.handleIdleStates();
     }
+  }
+
+  /**
+   * Wählt das passende Sprung-Bild basierend auf der aktuellen Fall-Geschwindigkeit.
+   */
+  playJumpAnimation() {
+    let i = 0;
+    if (this.speedY > 15) i = 0;
+    else if (this.speedY > 10) i = 1;
+    else if (this.speedY > 5) i = 2;
+    else if (this.speedY > 0) i = 3;
+    else if (this.speedY > -5) i = 4;
+    else if (this.speedY > -10) i = 5;
+    else if (this.speedY > -15) i = 6;
+    else if (this.speedY > -20) i = 7;
+    else i = 8;
+
+    let path = this.IMAGES_JUMPING[i];
+    this.img = this.imageCache[path];
   }
 
   handleIdleStates() {
@@ -191,6 +210,6 @@ class Character extends MovableObject {
   }
 
   jump() {
-    this.speedY = 20;
+    this.speedY = 25; // Etwas höherer Sprung für besseres Spielgefühl
   }
 }
