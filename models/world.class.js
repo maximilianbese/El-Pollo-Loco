@@ -81,27 +81,32 @@ class World {
   /* ── Collisions ────────────────────────────────────────── */
   checkCollisions() {
     this.level.enemies.forEach((enemy) => {
-      if (enemy.isDead() || !this.character.isColliding(enemy)) return;
-      if (this.canStompEnemy(enemy)) {
-        this.stompEnemy(enemy);
-      } else if (!this.character.isHurt()) {
-        this.character.hit();
-        this.healthBar.setPercentage(this.character.energy);
+      if (this.character.isColliding(enemy) && !enemy.isDead()) {
+        // Wir nutzen deine vorbereitete Funktion!
+        if (this.canStompEnemy(enemy)) {
+          this.stompEnemy(enemy);
+        }
+        // Nur wenn er NICHT stompt und Pepe nicht gerade unverwundbar ist (isHurt)
+        else if (!this.character.isHurt() && !enemy.isDead()) {
+          this.character.hit();
+          this.healthBar.setPercentage(this.character.energy);
+        }
       }
     });
   }
 
   canStompEnemy(enemy) {
     return (
-      enemy instanceof Chicken &&
+      (enemy instanceof Chicken || enemy instanceof SmallChicken) &&
       this.character.isAboveGround() &&
-      this.character.speedY < 0
+      this.character.speedY <= 0.5 && // Erhöhte Toleranz: zählt auch kurz vor dem Sinken
+      this.character.y + this.character.height > enemy.y // Pepe muss über der Oberkante des Gegners sein
     );
   }
 
   stompEnemy(enemy) {
-    enemy.energy = 0;
-    this.character.speedY = 10;
+    enemy.energy = 0; // Setzt Energie auf 0, damit isDead() true wird
+    this.character.speedY = 15; // Pepe hüpft nach dem Treffer wieder hoch
   }
 
   /* ── Bottle Collisions ─────────────────────────────────── */
