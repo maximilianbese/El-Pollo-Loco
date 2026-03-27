@@ -50,21 +50,28 @@ class World {
       this.checkBottlePickups();
       this.checkEndbossFirstContact();
       this.cleanupSplashedBottles();
-      this.checkGameStatus(); // <--- Neu hinzugefügt
+      this.checkGameStatus();
     }, 1000 / 60);
   }
 
-  // Prüft ob Pepe tot ist oder der Endboss besiegt wurde
+  /**
+   * Prüft den Spielzustand auf Sieg oder Niederlage
+   */
   checkGameStatus() {
+    // 1. Pepe stirbt
     if (this.character.isDead()) {
       this.gameOver = true;
       showGameOver(); // Funktion in game.js
     }
 
+    // 2. Endboss stirbt
     const boss = this.level.enemies.find((e) => e instanceof Endboss);
     if (boss && boss.isDead()) {
       this.gameOver = true;
-      setTimeout(() => showWin(), 1000); // Zeige Win-Screen nach kurzem Moment
+      // Kurze Verzögerung für die Todes-Animation des Bosses
+      setTimeout(() => {
+        showWin(); // Funktion in game.js
+      }, 1000);
     }
   }
 
@@ -118,7 +125,7 @@ class World {
         bottle.splash();
         if (enemy instanceof Endboss) {
           this.endbossBar.setPercentage(enemy.energy);
-          enemy.x += 30;
+          enemy.x += 30; // Kleiner Rückstoß für den Boss
         }
       }
     });
@@ -150,6 +157,7 @@ class World {
     this.lastThrow = true;
     setTimeout(() => (this.lastThrow = false), 300);
   }
+
   cleanupSplashedBottles() {
     this.throwableObjects = this.throwableObjects.filter((b) => !b.splashDone);
   }
@@ -221,12 +229,14 @@ class World {
       this.introTimer = 0;
     }
   }
+
   updateIntroHold() {
     if (this.introTimer > 70) {
       this.introPhase = "out";
       this.introTimer = 0;
     }
   }
+
   updateIntroFadeOut() {
     this.introAlpha = Math.max(this.introAlpha - 0.04, 0);
     if (this.introAlpha <= 0) {
@@ -234,7 +244,8 @@ class World {
       this.endbossIntroDone = true;
     }
   }
+
   draw() {
-    /* In world-draw.js */
+    /* Die Zeichenlogik wird über world-draw.js ausgeführt */
   }
 }

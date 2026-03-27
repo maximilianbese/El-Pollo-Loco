@@ -1,6 +1,12 @@
+let level1;
+
+/**
+ * Erstellt das Level-Objekt komplett neu.
+ * Wird beim ersten Start und bei jedem Neustart aufgerufen.
+ */
 function createLevel1() {
   level1 = new Level(
-    // Enemies
+    // Gegner (werden bei jedem Aufruf neu instanziiert)
     [
       new Chicken(),
       new SmallChicken(),
@@ -13,10 +19,10 @@ function createLevel1() {
       new Endboss(),
     ],
 
-    // Clouds
+    // Wolken
     [new Cloud()],
 
-    // Background layers
+    // Hintergrund-Ebenen
     [
       new BackgroundObject("img/5_background/layers/air.png", -720),
       new BackgroundObject("img/5_background/layers/3_third_layer/2.png", -720),
@@ -65,7 +71,7 @@ function createLevel1() {
       ),
     ],
 
-    // Coins scattered across the level
+    // Münzen (fixe Positionen)
     [
       new Coin(300, 300),
       new Coin(500, 250),
@@ -79,7 +85,7 @@ function createLevel1() {
       new Coin(2100, 250),
     ],
 
-    // Bottles on ground
+    // Flaschen auf dem Boden (fixe Positionen)
     [
       new BottleGround(400),
       new BottleGround(750),
@@ -90,6 +96,5 @@ function createLevel1() {
   );
 }
 
-// Initialize level on load
-let level1;
+// Initialer Aufruf beim Laden der Datei
 createLevel1();

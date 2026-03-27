@@ -1,9 +1,8 @@
 let canvas;
 let world;
 let keyboard = new Keyboard();
-
-/* ── Interval-Tracking ── */
 let globalIntervals = [];
+
 const _origSetInterval = window.setInterval;
 window.setInterval = function (fn, delay) {
   const id = _origSetInterval(fn, delay);
@@ -16,8 +15,6 @@ function clearAllIntervals() {
   globalIntervals = [];
 }
 
-/* ── Menü-Logik ── */
-
 function toggleControls() {
   const panel = document.getElementById("controls-panel");
   if (panel) panel.classList.toggle("d-none");
@@ -28,27 +25,30 @@ function startGame() {
   document.getElementById("game-wrapper").style.display = "flex";
   canvas = document.getElementById("canvas");
 
-  if (typeof initLevel === "function") initLevel();
-  else if (typeof createLevel1 === "function") createLevel1();
+  // Nutzt deine neue Funktion aus level1.js
+  if (typeof createLevel1 === "function") createLevel1();
 
   world = new World(canvas, keyboard);
-  if (typeof initMobileControls === "function") initMobileControls();
 }
 
 function restartGame() {
-  // Screens verstecken
+  // Beide End-Screens verstecken
   document.getElementById("game-over-screen").classList.add("d-none");
   document.getElementById("win-screen").classList.add("d-none");
 
+  // Alle laufenden Intervalle stoppen
   clearAllIntervals();
 
-  if (typeof initLevel === "function") initLevel();
-  else if (typeof createLevel1 === "function") createLevel1();
+  // 1. Level-Objekte (Gegner, Items) neu erstellen
+  if (typeof createLevel1 === "function") createLevel1();
 
+  // 2. Neue Welt-Instanz erstellen (setzt Pepe, Bars etc. zurück)
   world = new World(canvas, keyboard);
+
+  // 3. Kamera manuell auf Startposition setzen
+  world.camera_x = 0;
 }
 
-// Funktionen zum Anzeigen der Screens (werden von World.js aufgerufen)
 function showGameOver() {
   document.getElementById("game-over-screen").classList.remove("d-none");
   clearAllIntervals();
@@ -58,8 +58,6 @@ function showWin() {
   document.getElementById("win-screen").classList.remove("d-none");
   clearAllIntervals();
 }
-
-/* ── Fullscreen & Keyboard ── */
 
 function toggleFullscreen() {
   let element = document.getElementById("all-game-contents");
