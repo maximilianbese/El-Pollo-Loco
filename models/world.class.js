@@ -43,9 +43,7 @@ class World {
     this.keyboard = keyboard;
     this.setWorld();
 
-    // WICHTIG: Erst alle Sounds in die Liste, dann Volume anwenden
     this.applyVolume();
-
     this.run();
     this.draw();
   }
@@ -63,7 +61,7 @@ class World {
       this.win_sound,
       this.game_over_sound,
       this.character.walking_sound,
-      this.character.jump_sound, // Korrigiert von jumping_sound auf jump_sound
+      this.character.jump_sound,
       this.character.hurt_sound,
     ].filter((s) => s !== undefined);
   }
@@ -95,13 +93,33 @@ class World {
 
   /**
    * Zentrale Funktion zum Abspielen von Sounds.
+   * Verhindert den "AbortError" durch Abfangen des Play-Promises.
    */
   playAudio(audio) {
     if (!audio) return;
     audio.volume = this.isMuted ? 0 : this.globalVolume;
+
+    // Zurücksetzen des Sounds
     audio.pause();
     audio.currentTime = 0;
-    audio.play().catch((e) => console.warn("Audio playback failed:", e));
+
+    // Asynchrones Abspielen absichern
+    let playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Fehler wird lautlos abgefangen, um Konsole sauber zu halten
+      });
+    }
+  }
+
+  /**
+   * Stoppt alle laufenden Sounds (z.B. bei Game Over).
+   */
+  stopAllSounds() {
+    this.allSounds.forEach((sound) => {
+      sound.pause();
+      sound.currentTime = 0;
+    });
   }
 
   setWorld() {
@@ -143,16 +161,16 @@ class World {
     // 1. Pepe stirbt (Game Over)
     if (this.character.isDead() && !this.gameOver) {
       this.gameOver = true;
-      this.character.walking_sound.pause(); // Walking Sound explizit stoppen
-      this.boss_intro_sound.pause();
+      this.stopAllSounds(); // Alle Sounds sofort stoppen
       this.playAudio(this.game_over_sound);
       showGameOver();
     }
 
+    // 2. Boss stirbt (Sieg)
     const boss = this.level.enemies.find((e) => e instanceof Endboss);
     if (boss && boss.isDead() && !this.gameOver) {
       this.gameOver = true;
-      this.character.walking_sound.pause(); // Walking Sound auch bei Sieg stoppen
+      this.stopAllSounds(); // Alle Sounds sofort stoppen
       this.playAudio(this.win_sound);
       setTimeout(() => {
         showWin();
@@ -169,7 +187,7 @@ class World {
           if (enemy instanceof Endboss) {
             this.character.energy -= 20;
             this.character.lastHit = new Date().getTime();
-            this.playAudio(this.character.hurt_sound); // Hurt Sound bei Boss-Kontakt
+            this.playAudio(this.character.hurt_sound);
           } else {
             this.character.hit();
           }
@@ -339,6 +357,6 @@ class World {
   }
 
   draw() {
-    /* Zeichenlogik in world-draw.js */
+    /* Zeichenlogik bleibt extern in world-draw.js */
   }
 }

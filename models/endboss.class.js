@@ -51,24 +51,24 @@ class Endboss extends MovableObject {
     this.offset = {
       top: 50,
       bottom: 10,
-      left: 40, // Erhöhe diesen Wert, damit Pepe näher ran kann
-      right: 40, // Erhöhe diesen Wert ebenfalls
+      left: 40,
+      right: 40,
     };
   }
 
   animate() {
-    // 1. Logik & Bewegung (60 FPS für maximale Flüssigkeit)
+    // Logik & Bewegung
     setInterval(() => {
       if (this.isDead() || !this.hadFirstContact || !this.world) return;
 
       let distance =
         this.x - (this.world.character.x + this.world.character.width);
       if (distance > -100) {
-        this.moveLeft(); // Nutzt jetzt den Speed von 5 flüssig
+        this.moveLeft();
       }
     }, 1000 / 60);
 
-    // 2. Animation / Bilderwechsel
+    // Animation / Bilderwechsel
     setInterval(() => {
       if (this.isDead()) {
         this.animateDead();
@@ -77,7 +77,7 @@ class Endboss extends MovableObject {
       } else {
         this.checkStateAndPlayAnim();
       }
-    }, 150); // Etwas schnellerer Bilderwechsel für den Speed
+    }, 150);
   }
 
   checkStateAndPlayAnim() {
@@ -100,7 +100,12 @@ class Endboss extends MovableObject {
       this.deadFrameIndex++;
     } else {
       this.deadAnimDone = true;
-      setTimeout(() => showWinScreen(), 500);
+      // FEHLER BEHOBEN: showWin() statt showWinScreen()
+      setTimeout(() => {
+        if (typeof showWin === "function") {
+          showWin();
+        }
+      }, 500);
     }
   }
 
@@ -110,7 +115,6 @@ class Endboss extends MovableObject {
       this.energy = 0;
     } else {
       this.lastHit = new Date().getTime();
-      // Bei Speed 5 ist er schon extrem schnell, hier nur kleine Steigerung
       this.speed += 0.2;
     }
   }

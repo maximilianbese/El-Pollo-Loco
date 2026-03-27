@@ -1,270 +1,140 @@
-/* ═══════════════════════════════════════════════════════
-   MOBILE.CSS  –  El Pollo Loco
-   Controls als Overlay direkt auf dem Canvas
-   ═══════════════════════════════════════════════════════ */
+/* ══ MOBILE OPTIMIERUNG ════════════════════════════════════ */
 
-/* ══════════════════════════════════════════════════════════
-   1. ROTATE-DEVICE OVERLAY
-   ══════════════════════════════════════════════════════════ */
-#rotate-overlay {
-  display: none;
+/* Warnmeldung für Hochformat */
+#rotate-device-screen {
+  display: none; /* Standardmäßig versteckt */
   position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: rgba(0, 0, 0, 0.93);
-  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(44, 62, 80, 0.9);
+  color: white;
+  z-index: 10000; /* Ganz oben! */
+  flex-direction: column;
   justify-content: center;
-  flex-direction: column;
-  text-align: center;
-  color: #fff;
-  font-family: "Rye", sans-serif;
-}
-
-.rotate-content {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 24px;
+  text-align: center;
 }
 
-.rotate-icon {
-  font-size: clamp(48px, 15vw, 80px);
-  animation: tiltPhone 1.6s ease-in-out infinite;
-  transform-origin: center center;
-  line-height: 1;
+/* Das Smartphone-Emoji */
+.rotate-emoji {
+  font-size: 80px;
+  margin-bottom: 20px;
+  display: inline-block;
+  animation: rotateSmartphone 2s infinite ease-in-out;
 }
 
-.rotate-arrow {
-  font-size: clamp(36px, 10vw, 60px);
-  color: #f5a623;
-  animation: spinArrow 1.6s ease-in-out infinite;
+#rotate-device-screen p {
+  font-family: "Rye", cursive;
+  font-size: 20px;
+  margin: 0;
+  padding: 0 20px;
 }
 
-#rotate-overlay p {
-  font-size: clamp(1.1rem, 5vw, 1.6rem);
-  text-shadow: 1px 1px 4px #000;
-}
-.rotate-sub {
-  font-size: clamp(0.8rem, 3.5vw, 1rem) !important;
-  color: #ccc;
-  margin-top: 4px;
-}
-.rotate-sub strong {
-  color: #f5a623;
-}
-
-@keyframes tiltPhone {
-  0%,
-  100% {
+/* Die Dreh-Animation für das Emoji */
+@keyframes rotateSmartphone {
+  0% {
     transform: rotate(0deg);
   }
   50% {
-    transform: rotate(90deg);
+    transform: rotate(-90deg);
   }
-}
-@keyframes spinArrow {
-  0%,
   100% {
-    opacity: 1;
     transform: rotate(0deg);
   }
-  50% {
-    opacity: 0.4;
-    transform: rotate(180deg);
-  }
 }
 
-/* Nur auf Touch + Hochformat + ≤ 900px */
-@media (hover: none) and (orientation: portrait) and (max-width: 900px) {
-  #rotate-overlay {
-    display: flex;
-  }
+/* ══ STEUERUNG & BUTTONS ══════════════════════════════════ */
+.mobile-controls {
+  display: none; /* Am PC versteckt */
+  position: absolute;
+  bottom: 30px;
+  width: 100%;
+  z-index: 100;
+  padding: 0 30px;
+  box-sizing: border-box;
+  justify-content: space-between;
+  pointer-events: none;
 }
 
-/* ══════════════════════════════════════════════════════════
-   2. MOBILE CONTROLS  – standardmäßig versteckt
-   ══════════════════════════════════════════════════════════ */
-#mobile-controls {
-  display: none;
+.control-group {
+  display: flex;
+  gap: 20px;
+  pointer-events: auto;
 }
 
-/* ══════════════════════════════════════════════════════════
-   3. TOUCH-GERÄTE / SCHMALE DISPLAYS
-      Controls als Overlay über dem Canvas
-   ══════════════════════════════════════════════════════════ */
-@media (hover: none), (max-width: 600px) {
-  /* Start-Screen: Touch-Info zeigen, Tastatur-Info verstecken */
-  #keyboard-info {
+.mobile-btn {
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.25); /* Leicht erhöhte Deckkraft */
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  color: white;
+  user-select: none;
+  touch-action: manipulation;
+  /* HIER: Schatten statt Blur für bessere Sichtbarkeit */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-btn:active {
+  background: rgba(255, 152, 0, 0.6);
+  transform: scale(0.9);
+}
+
+.mobile-btn img {
+  width: 30px;
+  height: auto;
+}
+
+/* ══ MEDIA QUERIES (DIE LOGIK) ═════════════════════════════ */
+
+/* Gemeinsame Regeln für mobile Geräte (max 1000px) */
+@media (max-width: 1000px) {
+  /* Steuerung-Button im Startmenü verstecken */
+  .info-btn {
     display: none !important;
   }
-  #touch-info {
-    display: block !important;
-  }
 
-  /* Key-Legend ausblenden */
-  #key-legend {
-    display: none;
-  }
-
-  /* ── Controls als absolutes Overlay über dem Canvas ─────── */
-  #mobile-controls {
-    display: flex;
-    position: absolute;
-    inset: 0; /* füllt #game-container */
-    pointer-events: none; /* Canvas bleibt klickbar durch Lücken */
-    z-index: 20;
-
-    /* D-Pad links unten, Action rechts unten */
-    align-items: flex-end;
-    justify-content: space-between;
-    padding: clamp(8px, 2vw, 16px) clamp(10px, 3vw, 20px);
-    padding-bottom: clamp(10px, 3vw, 22px);
-  }
-
-  /* ── D-Pad ─────────────────────────────────────────────── */
-  .dpad {
-    display: flex;
-    gap: clamp(6px, 2.5vw, 16px);
-    align-items: center;
-    pointer-events: none;
-  }
-
-  .dpad-btn {
-    pointer-events: all; /* nur Buttons selbst abfangen */
-    width: clamp(48px, 13vw, 70px);
-    height: clamp(48px, 13vw, 70px);
-    border-radius: 50%;
-    border: 2.5px solid rgba(255, 255, 255, 0.5);
-    background: rgba(0, 0, 0, 0.38);
-    color: #fff;
-    font-size: clamp(18px, 5vw, 26px);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition:
-      background 0.08s,
-      transform 0.06s;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: none;
-    /* Glassmorphism-Look */
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  }
-
-  .dpad-btn:active,
-  .dpad-btn.pressed {
-    background: rgba(245, 166, 35, 0.6);
-    border-color: #f5a623;
-    transform: scale(0.91);
-  }
-
-  /* ── Action-Buttons ────────────────────────────────────── */
-  .action-btns {
-    display: flex;
-    gap: clamp(6px, 2.5vw, 16px);
-    align-items: center;
-    pointer-events: none;
-  }
-
-  .action-btn {
-    pointer-events: all;
-    width: clamp(52px, 14vw, 74px);
-    height: clamp(52px, 14vw, 74px);
-    border-radius: 50%;
-    border: 2.5px solid rgba(255, 255, 255, 0.5);
-    background: rgba(0, 0, 0, 0.38);
-    color: #fff;
-    font-size: clamp(20px, 5vw, 28px);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition:
-      background 0.08s,
-      transform 0.06s;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: none;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  }
-
-  /* Springen – blau */
-  .btn-jump {
-    background: rgba(30, 100, 255, 0.3);
-    border-color: rgba(80, 160, 255, 0.65);
-  }
-  .btn-jump:active,
-  .btn-jump.pressed {
-    background: rgba(30, 100, 255, 0.7);
-    border-color: #60aaff;
-    transform: scale(0.91);
-  }
-
-  /* Werfen – orange */
-  .btn-throw {
-    background: rgba(210, 70, 0, 0.3);
-    border-color: rgba(255, 140, 0, 0.65);
-  }
-  .btn-throw:active,
-  .btn-throw.pressed {
-    background: rgba(210, 70, 0, 0.7);
-    border-color: #ff8c00;
-    transform: scale(0.91);
+  /* Footer generell ausblenden auf kleinen Displays */
+  .footer-fixed {
+    display: none !important;
   }
 }
 
-/* ══════════════════════════════════════════════════════════
-   4. EXTRA KLEIN: ≤ 479px
-   ══════════════════════════════════════════════════════════ */
-@media (max-width: 479px) {
-  .dpad-btn {
-    width: clamp(40px, 12vw, 54px);
-    height: clamp(40px, 12vw, 54px);
-    font-size: clamp(15px, 4vw, 20px);
+/* 1. Wenn das Handy HOCHKANT gehalten wird (Portrait) */
+@media (max-width: 1000px) and (orientation: portrait) {
+  #rotate-device-screen {
+    display: flex !important;
   }
-  .action-btn {
-    width: clamp(44px, 13vw, 58px);
-    height: clamp(44px, 13vw, 58px);
-    font-size: clamp(15px, 4vw, 20px);
-  }
-  #mobile-controls {
-    padding: 6px 8px 10px 8px;
+  #all-game-contents {
+    display: none !important;
   }
 }
 
-/* ══════════════════════════════════════════════════════════
-   5. LANDSCAPE PHONE  –  Controls bleiben Overlay auf Canvas
-   ══════════════════════════════════════════════════════════ */
-@media (hover: none) and (max-height: 500px) and (orientation: landscape) {
-  /* Canvas füllt volle Höhe */
-  #game-wrapper {
-    flex-direction: row;
-    align-items: center;
+/* 2. Wenn das Handy QUER gehalten wird (Landscape) */
+@media (max-width: 1000px) and (orientation: landscape) {
+  #rotate-device-screen {
+    display: none !important;
+  }
+  #all-game-contents {
+    display: flex !important;
+    width: 100vw;
+    height: 100vh;
+    border: none;
+    border-radius: 0;
+  }
+  .mobile-controls {
+    display: flex;
+  }
+
+  /* Start-Button im Menü zentrieren */
+  .start-buttons {
+    display: flex;
     justify-content: center;
-    height: 100dvh;
-    overflow: hidden;
-  }
-
-  #game-container {
-    height: 100dvh;
-    width: auto;
-    aspect-ratio: 720 / 480;
-    flex-shrink: 0;
-  }
-
-  /* Controls bleiben Overlay – kein Layout-Shift */
-  #mobile-controls {
-    padding: 4px 10px 8px 10px;
-  }
-
-  .dpad-btn,
-  .action-btn {
-    width: clamp(36px, 9vw, 52px);
-    height: clamp(36px, 9vw, 52px);
-    font-size: clamp(13px, 3.5vw, 18px);
   }
 }

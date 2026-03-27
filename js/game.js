@@ -4,7 +4,6 @@ let keyboard = new Keyboard();
 let globalIntervals = [];
 
 // --- LOCAL STORAGE LOGIK ---
-// Wir laden die Werte direkt beim Start der Datei aus dem Speicher
 let currentVolume =
   localStorage.getItem("gameVolume") !== null
     ? parseFloat(localStorage.getItem("gameVolume"))
@@ -19,10 +18,9 @@ window.setInterval = function (fn, delay) {
   return id;
 };
 
-// Initialisierung nach dem Laden der Seite (um UI-Elemente anzupassen)
 window.addEventListener("load", () => {
   const icon = document.getElementById("mute-icon");
-  const slider = document.getElementById("volume-slider"); // Falls vorhanden
+  const slider = document.getElementById("volume-slider");
   if (icon) icon.innerText = isMuted ? "🔇" : "🔊";
   if (slider) slider.value = currentVolume;
 });
@@ -46,19 +44,23 @@ function startGame() {
 
   world = new World(canvas, keyboard);
 
-  // Einstellungen aus dem Speicher auf die neue Welt übertragen
+  // Einstellungen aus dem Speicher übertragen
   world.isMuted = isMuted;
   world.globalVolume = currentVolume;
   world.applyVolume();
+
+  // Mobile Steuerung binden, falls vorhanden
+  if (typeof bindTouchEvents === "function") {
+    bindTouchEvents();
+  }
 }
 
 function restartGame() {
   document.getElementById("game-over-screen").classList.add("d-none");
   document.getElementById("win-screen").classList.add("d-none");
 
-  // Audio-Status der alten Welt merken
-  let lastVol = world.globalVolume;
-  let lastMute = world.isMuted;
+  let lastVol = world ? world.globalVolume : currentVolume;
+  let lastMute = world ? world.isMuted : isMuted;
 
   clearAllIntervals();
   if (typeof createLevel1 === "function") createLevel1();
@@ -68,6 +70,10 @@ function restartGame() {
   world.isMuted = lastMute;
   world.applyVolume();
   world.camera_x = 0;
+
+  if (typeof bindTouchEvents === "function") {
+    bindTouchEvents();
+  }
 }
 
 function showGameOver() {
@@ -82,10 +88,7 @@ function showWin() {
 
 function toggleMute() {
   isMuted = !isMuted;
-
-  // Im LocalStorage speichern
   localStorage.setItem("gameMuted", isMuted);
-
   if (world) {
     world.toggleMute();
   }
@@ -94,10 +97,7 @@ function toggleMute() {
 
 function changeVolume(value) {
   currentVolume = parseFloat(value);
-
-  // Im LocalStorage speichern
   localStorage.setItem("gameVolume", currentVolume);
-
   if (world) {
     world.setVolume(currentVolume);
   }

@@ -1,74 +1,61 @@
-/* ═══════════════════════════════════════════════════════
-   MOBILE-CONTROLS.JS  –  El Pollo Loco
-   Bindet Touch-Events an die virtuellen Buttons und
-   schreibt in das globale `keyboard`-Objekt.
-   ═══════════════════════════════════════════════════════ */
-
 /**
- * Registriert Touch- und Mouse-Events für einen Button.
- * Setzt keyboard[key] auf true (press) und false (release).
- *
- * @param {string} btnId   – DOM-ID des Buttons
- * @param {string} key     – Schlüssel im Keyboard-Objekt
- * @param {object} kb      – das Keyboard-Objekt
- * @param {object} [opts]  – { onPress, onRelease } optionale Callbacks
+ * Initialisiert die Touch-Events für die mobile Steuerung.
+ * Diese Funktion sollte in deiner init() oder startGame() aufgerufen werden.
  */
-function bindControlButton(btnId, key, kb, opts = {}) {
-  const btn = document.getElementById(btnId);
-  if (!btn) return;
+function bindTouchEvents() {
+  // Buttons für die Bewegung (Links / Rechts)
+  const btnLeft = document.getElementById("btn-left");
+  const btnRight = document.getElementById("btn-right");
 
-  const press = (e) => {
+  // Buttons für Aktionen (Springen / Werfen)
+  const btnJump = document.getElementById("btn-jump");
+  const btnThrow = document.getElementById("btn-throw");
+
+  // Event-Listener für LINKS
+  btnLeft.addEventListener("touchstart", (e) => {
+    e.preventDefault(); // Verhindert Scrollen oder Zoomen beim Tippen
+    keyboard.LEFT = true;
+  });
+  btnLeft.addEventListener("touchend", (e) => {
     e.preventDefault();
-    kb[key] = true;
-    btn.classList.add("pressed");
-    if (opts.onPress) opts.onPress();
-  };
+    keyboard.LEFT = false;
+  });
 
-  const release = (e) => {
+  // Event-Listener für RECHTS
+  btnRight.addEventListener("touchstart", (e) => {
     e.preventDefault();
-    kb[key] = false;
-    btn.classList.remove("pressed");
-    if (opts.onRelease) opts.onRelease();
-  };
+    keyboard.RIGHT = true;
+  });
+  btnRight.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    keyboard.RIGHT = false;
+  });
 
-  // Touch
-  btn.addEventListener("touchstart", press, { passive: false });
-  btn.addEventListener("touchend", release, { passive: false });
-  btn.addEventListener("touchcancel", release, { passive: false });
+  // Event-Listener für SPRINGEN (Space-Ersatz)
+  btnJump.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    keyboard.SPACE = true;
+  });
+  btnJump.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    keyboard.SPACE = false;
+  });
 
-  // Mouse (für Dev-Tools Device-Emulation)
-  btn.addEventListener("mousedown", press);
-  btn.addEventListener("mouseup", release);
-  btn.addEventListener("mouseleave", release);
+  // Event-Listener für WERFEN (D-Ersatz)
+  btnThrow.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    keyboard.D = true;
+  });
+  btnThrow.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    keyboard.D = false;
+  });
 }
 
 /**
- * Initialisiert alle Mobile-Controls.
- * Wird aufgerufen nachdem das DOM bereit ist.
- * keyboard-Objekt wird über die globale Variable referenziert.
+ * Ruft die Initialisierung auf, sobald das Dokument geladen ist,
+ * oder du rufst bindTouchEvents() manuell in deiner game.js auf.
  */
-function initMobileControls() {
-  // keyboard ist in game.js definiert – wird nach DOMContentLoaded verfügbar
-  if (typeof keyboard === "undefined") {
-    console.warn("mobile-controls: keyboard object not found");
-    return;
-  }
-
-  bindControlButton("btn-left", "LEFT", keyboard);
-  bindControlButton("btn-right", "RIGHT", keyboard);
-  bindControlButton("btn-jump", "SPACE", keyboard);
-  bindControlButton("btn-throw", "D", keyboard);
-
-  // Verhindert Scrollen beim Tippen auf die Buttons
-  document
-    .getElementById("mobile-controls")
-    ?.addEventListener("touchmove", (e) => e.preventDefault(), {
-      passive: false,
-    });
-}
-
-// Warten bis DOM + Scripts geladen → dann initialisieren
-window.addEventListener("DOMContentLoaded", () => {
-  // Kurze Verzögerung, damit game.js sein `keyboard`-Objekt anlegen kann
-  setTimeout(initMobileControls, 0);
+window.addEventListener("load", () => {
+  bindTouchEvents();
 });

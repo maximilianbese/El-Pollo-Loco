@@ -38,6 +38,11 @@
     <script src="./js/game.js"></script>
   </head>
   <body>
+    <div id="rotate-device-screen">
+    <span class="rotate-emoji">📱</span>
+    <p>Bitte drehe dein Gerät ins Querformat!</p>
+</div>
+
     <div id="all-game-contents">
       <div id="start-screen">
         <div id="audio-panel" class="audio-controls">
@@ -101,6 +106,17 @@
       <div id="game-wrapper" style="display: none">
         <div id="game-container">
           <canvas id="canvas" width="720" height="480"></canvas>
+
+          <div class="mobile-controls">
+            <div class="control-group">
+              <div id="btn-left" class="mobile-btn">⬅</div>
+              <div id="btn-right" class="mobile-btn">➡</div>
+            </div>
+            <div class="control-group">
+              <div id="btn-jump" class="mobile-btn">▲</div>
+              <div id="btn-throw" class="mobile-btn"><img src="./img/hot-sauce.png"</div>
+            </div>
+          </div>
         </div>
       </div>
 
