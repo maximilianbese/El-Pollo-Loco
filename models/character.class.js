@@ -4,6 +4,14 @@ class Character extends MovableObject {
   y = 145;
   speed = 3;
 
+  // Engere Kollisionsbox für Pepe
+  offset = {
+    top: 120,
+    bottom: 10,
+    left: 30,
+    right: 30,
+  };
+
   IMAGES_WALKING = [
     "img/2_character_pepe/2_walk/W-21.png",
     "img/2_character_pepe/2_walk/W-22.png",
@@ -69,7 +77,6 @@ class Character extends MovableObject {
 
   lastActionTime = new Date().getTime();
 
-  // SOUNDS
   walking_sound = new Audio("audio/walking.mp3");
   jump_sound = new Audio("audio/jump.mp3");
   hurt_sound = new Audio("audio/hurt.mp3");
@@ -118,14 +125,12 @@ class Character extends MovableObject {
       isMoving = true;
     }
 
-    // --- Gehen Sound Logik ---
     if (isMoving && !this.isAboveGround()) {
       this.playWalkingSound();
     } else {
       this.walking_sound.pause();
     }
 
-    // --- Springen Logik ---
     if (this.world.keyboard.SPACE && !this.isAboveGround()) {
       this.jump();
       this.world.playAudio(this.jump_sound);
@@ -135,10 +140,6 @@ class Character extends MovableObject {
     this.world.camera_x = -this.x + 100;
   }
 
-  /**
-   * Spielt den Walking-Sound nur ab, wenn er nicht bereits läuft.
-   * Das verhindert das "Stottern" bei 60 FPS.
-   */
   playWalkingSound() {
     this.walking_sound.volume = this.world.isMuted
       ? 0

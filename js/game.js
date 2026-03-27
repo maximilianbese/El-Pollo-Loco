@@ -3,9 +3,14 @@ let world;
 let keyboard = new Keyboard();
 let globalIntervals = [];
 
-// Globale Audio-Werte zum Zwischenspeichern der Slider-Einstellung
-let currentVolume = 0.5;
-let isMuted = false;
+// --- LOCAL STORAGE LOGIK ---
+// Wir laden die Werte direkt beim Start der Datei aus dem Speicher
+let currentVolume =
+  localStorage.getItem("gameVolume") !== null
+    ? parseFloat(localStorage.getItem("gameVolume"))
+    : 0.5;
+
+let isMuted = localStorage.getItem("gameMuted") === "true";
 
 const _origSetInterval = window.setInterval;
 window.setInterval = function (fn, delay) {
@@ -13,6 +18,14 @@ window.setInterval = function (fn, delay) {
   globalIntervals.push(id);
   return id;
 };
+
+// Initialisierung nach dem Laden der Seite (um UI-Elemente anzupassen)
+window.addEventListener("load", () => {
+  const icon = document.getElementById("mute-icon");
+  const slider = document.getElementById("volume-slider"); // Falls vorhanden
+  if (icon) icon.innerText = isMuted ? "🔇" : "🔊";
+  if (slider) slider.value = currentVolume;
+});
 
 function clearAllIntervals() {
   globalIntervals.forEach((id) => clearInterval(id));
@@ -33,7 +46,7 @@ function startGame() {
 
   world = new World(canvas, keyboard);
 
-  // Einstellungen aus dem Startmenü auf die neue Welt übertragen
+  // Einstellungen aus dem Speicher auf die neue Welt übertragen
   world.isMuted = isMuted;
   world.globalVolume = currentVolume;
   world.applyVolume();
@@ -69,6 +82,10 @@ function showWin() {
 
 function toggleMute() {
   isMuted = !isMuted;
+
+  // Im LocalStorage speichern
+  localStorage.setItem("gameMuted", isMuted);
+
   if (world) {
     world.toggleMute();
   }
@@ -77,6 +94,10 @@ function toggleMute() {
 
 function changeVolume(value) {
   currentVolume = parseFloat(value);
+
+  // Im LocalStorage speichern
+  localStorage.setItem("gameVolume", currentVolume);
+
   if (world) {
     world.setVolume(currentVolume);
   }
