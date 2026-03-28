@@ -1,8 +1,8 @@
-/* ══ MOBILE OPTIMIERUNG ════════════════════════════════════ */
+/* ══ MOBILE OPTIMIZATION ════════════════════════════════════ */
 
-/* Warnmeldung für Hochformat */
+/* Warning screen for portrait mode */
 #rotate-device-screen {
-  display: none; /* Standardmäßig versteckt */
+  display: none; /* Hidden by default */
   position: fixed;
   top: 0;
   left: 0;
@@ -10,14 +10,14 @@
   height: 100vh;
   background-color: rgba(44, 62, 80, 0.9);
   color: white;
-  z-index: 10000; /* Ganz oben! */
+  z-index: 10000; /* Always on top */
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
 }
 
-/* Das Smartphone-Emoji */
+/* Smartphone rotate animation */
 .rotate-emoji {
   font-size: 80px;
   margin-bottom: 20px;
@@ -32,7 +32,6 @@
   padding: 0 20px;
 }
 
-/* Die Dreh-Animation für das Emoji */
 @keyframes rotateSmartphone {
   0% {
     transform: rotate(0deg);
@@ -45,9 +44,9 @@
   }
 }
 
-/* ══ STEUERUNG & BUTTONS ══════════════════════════════════ */
+/* ══ CONTROLS & BUTTONS ══════════════════════════════════ */
 .mobile-controls {
-  display: none; /* Am PC versteckt */
+  display: none; /* Hidden on Desktop */
   position: absolute;
   bottom: 30px;
   width: 100%;
@@ -67,7 +66,7 @@
 .mobile-btn {
   width: 70px;
   height: 70px;
-  background: rgba(255, 255, 255, 0.25); /* Leicht erhöhte Deckkraft */
+  background: rgba(255, 255, 255, 0.25);
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   display: flex;
@@ -77,7 +76,6 @@
   color: white;
   user-select: none;
   touch-action: manipulation;
-  /* HIER: Schatten statt Blur für bessere Sichtbarkeit */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -91,22 +89,22 @@
   height: auto;
 }
 
-/* ══ MEDIA QUERIES (DIE LOGIK) ═════════════════════════════ */
+/* ══ MOBILE LEGAL LINKS ══════════════════════════════════ */
+.mobile-legal-links {
+  display: none; /* Hidden on Desktop */
+}
 
-/* Gemeinsame Regeln für mobile Geräte (max 1000px) */
+/* ══ MEDIA QUERIES ════════════════════════════════════════ */
+
+/* General rules for mobile devices (max 1000px) */
 @media (max-width: 1000px) {
-  /* Steuerung-Button im Startmenü verstecken */
-  .info-btn {
-    display: none !important;
-  }
-
-  /* Footer generell ausblenden auf kleinen Displays */
+  .info-btn,
   .footer-fixed {
     display: none !important;
   }
 }
 
-/* 1. Wenn das Handy HOCHKANT gehalten wird (Portrait) */
+/* 1. Device held vertically (Portrait) */
 @media (max-width: 1000px) and (orientation: portrait) {
   #rotate-device-screen {
     display: flex !important;
@@ -116,25 +114,47 @@
   }
 }
 
-/* 2. Wenn das Handy QUER gehalten wird (Landscape) */
+/* 2. Device held horizontally (Landscape) */
 @media (max-width: 1000px) and (orientation: landscape) {
   #rotate-device-screen {
     display: none !important;
   }
+
   #all-game-contents {
     display: flex !important;
     width: 100vw;
     height: 100vh;
     border: none;
     border-radius: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: black; /* Black bars if aspect ratio differs */
   }
+
   .mobile-controls {
     display: flex;
   }
 
-  /* Start-Button im Menü zentrieren */
   .start-buttons {
     display: flex;
     justify-content: center;
+  }
+
+  /* Display legal links in mobile start menu */
+  .mobile-legal-links {
+    display: flex;
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    justify-content: center;
+    gap: 20px;
+    z-index: 101;
+  }
+
+  .mobile-legal-links a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 12px;
+    font-family: sans-serif;
   }
 }

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -39,9 +39,9 @@
   </head>
   <body>
     <div id="rotate-device-screen">
-    <span class="rotate-emoji">📱</span>
-    <p>Bitte drehe dein Gerät ins Querformat!</p>
-</div>
+      <span class="rotate-emoji">📱</span>
+      <p>Please rotate your device to landscape mode!</p>
+    </div>
 
     <div id="all-game-contents">
       <div id="start-screen">
@@ -61,43 +61,51 @@
         </div>
 
         <div class="start-bg">
-          <img src="./img/9_intro_outro_screens/start/startscreen_1.png" />
+          <img
+            src="./img/9_intro_outro_screens/start/startscreen_1.png"
+            alt="Startscreen"
+          />
         </div>
 
         <div class="start-overlay">
           <div class="start-buttons">
             <button class="menu-btn start-btn" onclick="startGame()">
-              ▶ Spiel starten
+              ▶ Start Game
             </button>
             <button class="menu-btn info-btn" onclick="toggleControls()">
-              🎮 Steuerung
+              🎮 Controls
             </button>
           </div>
         </div>
 
+        <div class="mobile-legal-links">
+          <a href="./impressum.html">Imprint</a>
+          <a href="./datenschutz.html">Privacy Policy</a>
+        </div>
+
         <div id="controls-panel" class="d-none">
           <button class="close-btn" onclick="toggleControls()">✖</button>
-          <h2>Steuerung</h2>
+          <h2>Controls</h2>
           <table>
             <tr>
               <td class="key">⬅ ➡</td>
-              <td>Bewegen</td>
+              <td>Move</td>
             </tr>
             <tr>
-              <td class="key">Leertaste</td>
-              <td>Springen</td>
+              <td class="key">Space</td>
+              <td>Jump</td>
             </tr>
             <tr>
               <td class="key">D</td>
-              <td>Werfen</td>
+              <td>Throw</td>
             </tr>
             <tr>
               <td class="key">F</td>
-              <td>Vollbild (An/Aus)</td>
+              <td>Fullscreen (On/Off)</td>
             </tr>
             <tr>
               <td class="key">M</td>
-              <td>Ton (An/Aus)</td>
+              <td>Mute (On/Off)</td>
             </tr>
           </table>
         </div>
@@ -114,7 +122,9 @@
             </div>
             <div class="control-group">
               <div id="btn-jump" class="mobile-btn">▲</div>
-              <div id="btn-throw" class="mobile-btn"><img src="./img/hot-sauce.png"</div>
+              <div id="btn-throw" class="mobile-btn">
+                <img src="./img/6_salsa_bottle/salsa_bottle.png" alt="throw" />
+              </div>
             </div>
           </div>
         </div>
@@ -126,7 +136,7 @@
           class="end-screen-img"
         />
         <button class="menu-btn restart-btn" onclick="restartGame()">
-          🔄 Neustart
+          🔄 Restart
         </button>
       </div>
 
@@ -136,18 +146,16 @@
           class="end-screen-img"
         />
         <button class="menu-btn restart-btn" onclick="restartGame()">
-          🔄 Nochmal spielen
+          🔄 Play Again
         </button>
       </div>
     </div>
 
     <footer class="footer-fixed">
-      <a href="./impressum.html" target="_blank" class="legal-link">
-        Impressum
-      </a>
-      <a href="./datenschutz.html" target="_blank" class="legal-link">
-        Datenschutz
-      </a>
+      <a href="./impressum.html" target="_blank" class="legal-link">Imprint</a>
+      <a href="./datenschutz.html" target="_blank" class="legal-link"
+        >Privacy Policy</a
+      >
     </footer>
   </body>
 </html>
