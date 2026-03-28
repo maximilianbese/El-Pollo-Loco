@@ -1,3 +1,6 @@
+/**
+ * Represents a decorative cloud that drifts slowly to the left.
+ */
 class Cloud extends MovableObject {
   y = 50;
   height = 250;
@@ -9,9 +12,10 @@ class Cloud extends MovableObject {
     this.animate();
   }
 
+  /**
+   * Starts the cloud's continuous leftward drift at its base speed.
+   */
   animate() {
-    setInterval(() => {
-      this.moveLeft();
-    }, 1000 / 60);
+    setInterval(() => this.moveLeft(), 1000 / 60);
   }
 }

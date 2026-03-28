@@ -1,16 +1,18 @@
+/**
+ * Represents the player character "Pepe".
+ * Handles movement input, physics, animation states, and sound playback.
+ */
 class Character extends MovableObject {
   height = 280;
   width = 120;
   y = 145;
   speed = 3;
+  offset = { top: 120, bottom: 10, left: 30, right: 30 };
+  lastActionTime = new Date().getTime();
 
-  // Engere Kollisionsbox für Pepe
-  offset = {
-    top: 120,
-    bottom: 10,
-    left: 30,
-    right: 30,
-  };
+  walking_sound = new Audio("audio/walking.mp3");
+  jump_sound = new Audio("audio/jump.mp3");
+  hurt_sound = new Audio("audio/hurt.mp3");
 
   IMAGES_WALKING = [
     "img/2_character_pepe/2_walk/W-21.png",
@@ -20,7 +22,6 @@ class Character extends MovableObject {
     "img/2_character_pepe/2_walk/W-25.png",
     "img/2_character_pepe/2_walk/W-26.png",
   ];
-
   IMAGES_IDLE = [
     "img/2_character_pepe/1_idle/idle/I-1.png",
     "img/2_character_pepe/1_idle/idle/I-2.png",
@@ -33,7 +34,6 @@ class Character extends MovableObject {
     "img/2_character_pepe/1_idle/idle/I-9.png",
     "img/2_character_pepe/1_idle/idle/I-10.png",
   ];
-
   IMAGES_LONG_IDLE = [
     "img/2_character_pepe/1_idle/long_idle/I-11.png",
     "img/2_character_pepe/1_idle/long_idle/I-12.png",
@@ -46,25 +46,22 @@ class Character extends MovableObject {
     "img/2_character_pepe/1_idle/long_idle/I-19.png",
     "img/2_character_pepe/1_idle/long_idle/I-20.png",
   ];
-
   IMAGES_JUMPING = [
-    "img/2_character_pepe/3_jump/J-31.png", // [0] Start
-    "img/2_character_pepe/3_jump/J-32.png", // [1]
-    "img/2_character_pepe/3_jump/J-33.png", // [2]
-    "img/2_character_pepe/3_jump/J-34.png", // [3]
-    "img/2_character_pepe/3_jump/J-35.png", // [4] Oben
-    "img/2_character_pepe/3_jump/J-36.png", // [5]
-    "img/2_character_pepe/3_jump/J-37.png", // [6]
-    "img/2_character_pepe/3_jump/J-38.png", // [7]
-    "img/2_character_pepe/3_jump/J-39.png", // [8] Landung
+    "img/2_character_pepe/3_jump/J-31.png",
+    "img/2_character_pepe/3_jump/J-32.png",
+    "img/2_character_pepe/3_jump/J-33.png",
+    "img/2_character_pepe/3_jump/J-34.png",
+    "img/2_character_pepe/3_jump/J-35.png",
+    "img/2_character_pepe/3_jump/J-36.png",
+    "img/2_character_pepe/3_jump/J-37.png",
+    "img/2_character_pepe/3_jump/J-38.png",
+    "img/2_character_pepe/3_jump/J-39.png",
   ];
-
   IMAGES_HURT = [
     "img/2_character_pepe/4_hurt/H-41.png",
     "img/2_character_pepe/4_hurt/H-42.png",
     "img/2_character_pepe/4_hurt/H-43.png",
   ];
-
   IMAGES_DEAD = [
     "img/2_character_pepe/5_dead/D-51.png",
     "img/2_character_pepe/5_dead/D-52.png",
@@ -74,12 +71,6 @@ class Character extends MovableObject {
     "img/2_character_pepe/5_dead/D-56.png",
     "img/2_character_pepe/5_dead/D-57.png",
   ];
-
-  lastActionTime = new Date().getTime();
-
-  walking_sound = new Audio("audio/walking.mp3");
-  jump_sound = new Audio("audio/jump.mp3");
-  hurt_sound = new Audio("audio/hurt.mp3");
 
   constructor() {
     super().loadImage("img/2_character_pepe/1_idle/idle/I-1.png");
@@ -93,76 +84,94 @@ class Character extends MovableObject {
     this.animate();
   }
 
+  /**
+   * Starts the movement and animation update intervals.
+   */
   animate() {
-    setInterval(() => {
-      this.moveCharacter();
-    }, 1000 / 60);
-
-    setInterval(() => {
-      this.playCharacterAnimations();
-    }, 100); // Auf 100ms verkürzt für schnellere Reaktionszeit
+    setInterval(() => this.moveCharacter(), 1000 / 60);
+    setInterval(() => this.playCharacterAnimations(), 100);
   }
 
+  /**
+   * Processes keyboard input each frame: handles horizontal movement,
+   * walking sound, jumping, and camera tracking.
+   */
   moveCharacter() {
     if (this.isDead()) {
       this.walking_sound.pause();
       return;
     }
+    const isMoving = this.handleHorizontalMovement();
+    isMoving && !this.isAboveGround()
+      ? this.playWalkingSound()
+      : this.walking_sound.pause();
+    this.handleJump();
+    this.world.camera_x = -this.x + 100;
+  }
 
+  /**
+   * Moves the character left or right based on keyboard input.
+   * @returns {boolean} True if the character moved this frame.
+   */
+  handleHorizontalMovement() {
     let isMoving = false;
-
     if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
       this.moveRight();
       this.otherDirection = false;
       this.resetIdleTimer();
       isMoving = true;
     }
-
     if (this.world.keyboard.LEFT && this.x > 0) {
       this.moveLeft();
       this.otherDirection = true;
       this.resetIdleTimer();
       isMoving = true;
     }
+    return isMoving;
+  }
 
-    if (isMoving && !this.isAboveGround()) {
-      this.playWalkingSound();
-    } else {
-      this.walking_sound.pause();
-    }
-
+  /**
+   * Triggers a jump when SPACE is pressed and the character is on the ground.
+   */
+  handleJump() {
     if (this.world.keyboard.SPACE && !this.isAboveGround()) {
       this.jump();
       this.world.playAudio(this.jump_sound);
       this.resetIdleTimer();
     }
-
-    this.world.camera_x = -this.x + 100;
   }
 
+  /**
+   * Plays the walking sound loop, respecting mute and volume settings.
+   */
   playWalkingSound() {
     this.walking_sound.volume = this.world.isMuted
       ? 0
       : this.world.globalVolume;
-    if (this.walking_sound.paused) {
-      this.walking_sound.play().catch((e) => {});
-    }
+    if (this.walking_sound.paused) this.walking_sound.play().catch(() => {});
   }
 
+  /**
+   * Reduces character energy by 5 on a normal hit and plays the hurt sound.
+   */
   hit() {
     this.energy -= 5;
-    if (this.energy < 0) {
-      this.energy = 0;
-    } else {
+    if (this.energy < 0) this.energy = 0;
+    else {
       this.lastHit = new Date().getTime();
       this.world.playAudio(this.hurt_sound);
     }
   }
 
+  /** Resets the idle timer to the current time. */
   resetIdleTimer() {
     this.lastActionTime = new Date().getTime();
   }
 
+  /**
+   * Chooses the correct animation set based on the character's current state.
+   * Priority: dead > hurt > jumping > walking > idle.
+   */
   playCharacterAnimations() {
     if (this.isDead()) {
       this.playAnimation(this.IMAGES_DEAD);
@@ -170,46 +179,35 @@ class Character extends MovableObject {
     } else if (this.isHurt()) {
       this.playAnimation(this.IMAGES_HURT);
       this.resetIdleTimer();
-    } else if (this.isAboveGround()) {
-      this.playJumpAnimation(); // Neue Logik für flüssige Sprünge
-    } else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
+    } else if (this.isAboveGround()) this.playJumpAnimation();
+    else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT)
       this.playAnimation(this.IMAGES_WALKING);
-    } else {
-      this.handleIdleStates();
-    }
+    else this.handleIdleStates();
   }
 
   /**
-   * Wählt das passende Sprung-Bild basierend auf der aktuellen Fall-Geschwindigkeit.
+   * Selects the jump animation frame matching the current vertical speed.
+   * Maps speedY ranges to one of 9 jump frames for smooth visual feedback.
    */
   playJumpAnimation() {
-    let i = 0;
-    if (this.speedY > 15) i = 0;
-    else if (this.speedY > 10) i = 1;
-    else if (this.speedY > 5) i = 2;
-    else if (this.speedY > 0) i = 3;
-    else if (this.speedY > -5) i = 4;
-    else if (this.speedY > -10) i = 5;
-    else if (this.speedY > -15) i = 6;
-    else if (this.speedY > -20) i = 7;
-    else i = 8;
-
-    let path = this.IMAGES_JUMPING[i];
-    this.img = this.imageCache[path];
+    const thresholds = [15, 10, 5, 0, -5, -10, -15, -20];
+    const i = thresholds.findIndex((t) => this.speedY > t);
+    this.img = this.imageCache[this.IMAGES_JUMPING[i === -1 ? 8 : i]];
   }
 
+  /**
+   * Plays the short idle or long idle animation based on inactivity duration.
+   * Long idle triggers after 3 seconds of no movement.
+   */
   handleIdleStates() {
-    let now = new Date().getTime();
-    let timePassed = now - this.lastActionTime;
-
-    if (timePassed >= 3000) {
-      this.playAnimation(this.IMAGES_LONG_IDLE);
-    } else {
-      this.playAnimation(this.IMAGES_IDLE);
-    }
+    const timePassed = new Date().getTime() - this.lastActionTime;
+    this.playAnimation(
+      timePassed >= 3000 ? this.IMAGES_LONG_IDLE : this.IMAGES_IDLE,
+    );
   }
 
+  /** Sets the vertical speed for a jump. */
   jump() {
-    this.speedY = 25; // Etwas höherer Sprung für besseres Spielgefühl
+    this.speedY = 20;
   }
 }

@@ -1,3 +1,7 @@
+/**
+ * Represents the final boss in the game.
+ * Inherits from MovableObject.
+ */
 class Endboss extends MovableObject {
   height = 400;
   width = 250;
@@ -5,6 +9,8 @@ class Endboss extends MovableObject {
   energy = 100;
   speed = 3;
   hadFirstContact = false;
+  deadAnimDone = false;
+  deadFrameIndex = 0;
   world;
 
   IMAGES_ALERT = [
@@ -37,9 +43,9 @@ class Endboss extends MovableObject {
     "img/4_enemie_boss_chicken/5_dead/G26.png",
   ];
 
-  deadAnimDone = false;
-  deadFrameIndex = 0;
-
+  /**
+   * Initializes the Endboss with images, position and animation.
+   */
   constructor() {
     super().loadImage(this.IMAGES_ALERT[0]);
     this.loadImages(this.IMAGES_ALERT);
@@ -47,68 +53,74 @@ class Endboss extends MovableObject {
     this.loadImages(this.IMAGES_HURT);
     this.loadImages(this.IMAGES_DEAD);
     this.x = 2500;
+    this.offset = { top: 50, bottom: 10, left: 40, right: 40 };
     this.animate();
-    this.offset = {
-      top: 50,
-      bottom: 10,
-      left: 40,
-      right: 40,
-    };
   }
 
+  /**
+   * Starts the movement and animation intervals.
+   */
   animate() {
-    // Logik & Bewegung
     setInterval(() => {
-      if (this.isDead() || !this.hadFirstContact || !this.world) return;
-
-      let distance =
-        this.x - (this.world.character.x + this.world.character.width);
-      if (distance > -100) {
-        this.moveLeft();
+      if (!this.isDead() && this.hadFirstContact && this.world) {
+        this.moveTowardsCharacter();
       }
     }, 1000 / 60);
-
-    // Animation / Bilderwechsel
-    setInterval(() => {
-      if (this.isDead()) {
-        this.animateDead();
-      } else if (this.isHurt()) {
-        this.playAnimation(this.IMAGES_HURT);
-      } else {
-        this.checkStateAndPlayAnim();
-      }
-    }, 150);
+    setInterval(() => this.playBossAnimations(), 150);
   }
 
-  checkStateAndPlayAnim() {
-    if (this.hadFirstContact && this.world) {
-      let distance =
-        this.x - (this.world.character.x + this.world.character.width);
-      if (distance > 30) {
-        this.playAnimation(this.IMAGES_WALKING);
-      } else {
-        this.playAnimation(this.IMAGES_ALERT);
-      }
+  /**
+   * Tracks the character and moves the boss accordingly.
+   */
+  moveTowardsCharacter() {
+    let charX = this.world.character.x;
+    this.otherDirection = charX > this.x;
+    if (Math.abs(this.x - charX) > 10) {
+      this.otherDirection ? this.moveRight() : this.moveLeft();
     }
   }
 
+  /**
+   * Decides which animation to play based on the boss state.
+   */
+  playBossAnimations() {
+    if (this.isDead()) {
+      this.animateDead();
+    } else if (this.isHurt()) {
+      this.playAnimation(this.IMAGES_HURT);
+    } else {
+      this.checkStateAndPlayAnim();
+    }
+  }
+
+  /**
+   * Plays either walking or alert animation based on contact.
+   */
+  checkStateAndPlayAnim() {
+    if (this.hadFirstContact) {
+      this.playAnimation(this.IMAGES_WALKING);
+    } else {
+      this.playAnimation(this.IMAGES_ALERT);
+    }
+  }
+
+  /**
+   * Handles the death animation sequence.
+   */
   animateDead() {
     if (this.deadAnimDone) return;
     if (this.deadFrameIndex < this.IMAGES_DEAD.length) {
-      let path = this.IMAGES_DEAD[this.deadFrameIndex];
-      this.img = this.imageCache[path];
+      this.img = this.imageCache[this.IMAGES_DEAD[this.deadFrameIndex]];
       this.deadFrameIndex++;
     } else {
       this.deadAnimDone = true;
-      // FEHLER BEHOBEN: showWin() statt showWinScreen()
-      setTimeout(() => {
-        if (typeof showWin === "function") {
-          showWin();
-        }
-      }, 500);
+      setTimeout(() => typeof showWin === "function" && showWin(), 500);
     }
   }
 
+  /**
+   * Decreases energy and increases speed when hit.
+   */
   hit() {
     this.energy -= 20;
     if (this.energy < 0) {

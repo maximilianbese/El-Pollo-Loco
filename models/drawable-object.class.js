@@ -1,3 +1,7 @@
+/**
+ * Base class for all drawable game objects.
+ * Handles image loading, caching, and rendering to the canvas.
+ */
 class DrawableObject {
   img;
   imageCache = {};
@@ -7,29 +11,29 @@ class DrawableObject {
   height = 150;
   width = 100;
 
+  /**
+   * Loads a single image from the given path into `this.img`.
+   * @param {string} path - Relative path to the image file.
+   */
   loadImage(path) {
     this.img = new Image();
     this.img.src = path;
   }
 
+  /**
+   * Draws the object onto the canvas if the image is fully loaded.
+   * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+   */
   draw(ctx) {
     if (this.img && this.img.complete && this.img.naturalWidth > 0) {
       ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
     }
   }
 
-  drawFrame(ctx) {
-    // Debug frames – comment out for production
-    // if (this instanceof Character || this instanceof Chicken) {
-    //   ctx.beginPath();
-    //   ctx.lineWidth = "2";
-    //   ctx.strokeStyle = "blue";
-    //   ctx.rect(this.x, this.y, this.width, this.height);
-    //   ctx.stroke();
-    // }
-  }
-
-  /** @param {Array} arr - ['img/image1.png', 'img/image2.png', ...] */
+  /**
+   * Preloads an array of images into the image cache for fast animation.
+   * @param {string[]} arr - Array of image paths to preload.
+   */
   loadImages(arr) {
     arr.forEach((path) => {
       let img = new Image();

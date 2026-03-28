@@ -1,61 +1,62 @@
 /**
- * Initialisiert die Touch-Events für die mobile Steuerung.
- * Diese Funktion sollte in deiner init() oder startGame() aufgerufen werden.
+ * Binds touch events on the mobile control buttons to the global keyboard state.
+ * Must be called after the game DOM is visible (called from startGame/restartGame).
  */
 function bindTouchEvents() {
-  // Buttons für die Bewegung (Links / Rechts)
-  const btnLeft = document.getElementById("btn-left");
-  const btnRight = document.getElementById("btn-right");
-
-  // Buttons für Aktionen (Springen / Werfen)
-  const btnJump = document.getElementById("btn-jump");
-  const btnThrow = document.getElementById("btn-throw");
-
-  // Event-Listener für LINKS
-  btnLeft.addEventListener("touchstart", (e) => {
-    e.preventDefault(); // Verhindert Scrollen oder Zoomen beim Tippen
-    keyboard.LEFT = true;
-  });
-  btnLeft.addEventListener("touchend", (e) => {
-    e.preventDefault();
-    keyboard.LEFT = false;
-  });
-
-  // Event-Listener für RECHTS
-  btnRight.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    keyboard.RIGHT = true;
-  });
-  btnRight.addEventListener("touchend", (e) => {
-    e.preventDefault();
-    keyboard.RIGHT = false;
-  });
-
-  // Event-Listener für SPRINGEN (Space-Ersatz)
-  btnJump.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    keyboard.SPACE = true;
-  });
-  btnJump.addEventListener("touchend", (e) => {
-    e.preventDefault();
-    keyboard.SPACE = false;
-  });
-
-  // Event-Listener für WERFEN (D-Ersatz)
-  btnThrow.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    keyboard.D = true;
-  });
-  btnThrow.addEventListener("touchend", (e) => {
-    e.preventDefault();
-    keyboard.D = false;
-  });
+  bindButton(
+    "btn-left",
+    () => {
+      keyboard.LEFT = true;
+    },
+    () => {
+      keyboard.LEFT = false;
+    },
+  );
+  bindButton(
+    "btn-right",
+    () => {
+      keyboard.RIGHT = true;
+    },
+    () => {
+      keyboard.RIGHT = false;
+    },
+  );
+  bindButton(
+    "btn-jump",
+    () => {
+      keyboard.SPACE = true;
+    },
+    () => {
+      keyboard.SPACE = false;
+    },
+  );
+  bindButton(
+    "btn-throw",
+    () => {
+      keyboard.D = true;
+    },
+    () => {
+      keyboard.D = false;
+    },
+  );
 }
 
 /**
- * Ruft die Initialisierung auf, sobald das Dokument geladen ist,
- * oder du rufst bindTouchEvents() manuell in deiner game.js auf.
+ * Adds touchstart and touchend listeners to a button element.
+ * Calls preventDefault to avoid scroll/zoom side effects.
+ * @param {string} id - The DOM element ID of the button.
+ * @param {Function} onStart - Callback fired on touchstart.
+ * @param {Function} onEnd - Callback fired on touchend.
  */
-window.addEventListener("load", () => {
-  bindTouchEvents();
-});
+function bindButton(id, onStart, onEnd) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    onStart();
+  });
+  btn.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    onEnd();
+  });
+}

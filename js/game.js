@@ -3,14 +3,14 @@ let world;
 let keyboard = new Keyboard();
 let globalIntervals = [];
 
-// --- LOCAL STORAGE LOGIK ---
+// Persist volume and mute state across sessions via localStorage
 let currentVolume =
   localStorage.getItem("gameVolume") !== null
     ? parseFloat(localStorage.getItem("gameVolume"))
     : 0.5;
-
 let isMuted = localStorage.getItem("gameMuted") === "true";
 
+// Override setInterval globally to track all interval IDs for cleanup
 const _origSetInterval = window.setInterval;
 window.setInterval = function (fn, delay) {
   const id = _origSetInterval(fn, delay);
@@ -25,103 +25,107 @@ window.addEventListener("load", () => {
   if (slider) slider.value = currentVolume;
 });
 
+/**
+ * Clears all tracked setInterval instances to stop the game loop on restart.
+ */
 function clearAllIntervals() {
   globalIntervals.forEach((id) => clearInterval(id));
   globalIntervals = [];
 }
 
+/**
+ * Toggles the keyboard controls panel on the start screen.
+ */
 function toggleControls() {
-  const panel = document.getElementById("controls-panel");
-  if (panel) panel.classList.toggle("d-none");
+  document.getElementById("controls-panel")?.classList.toggle("d-none");
 }
 
+/**
+ * Hides the start screen, initializes the level and world,
+ * transfers audio settings, and binds mobile touch controls.
+ */
 function startGame() {
   document.getElementById("start-screen").style.display = "none";
   document.getElementById("game-wrapper").style.display = "flex";
   canvas = document.getElementById("canvas");
-
-  if (typeof createLevel1 === "function") createLevel1();
-
+  createLevel1();
   world = new World(canvas, keyboard);
-
-  // Einstellungen aus dem Speicher übertragen
   world.isMuted = isMuted;
   world.globalVolume = currentVolume;
   world.applyVolume();
-
-  // Mobile Steuerung binden, falls vorhanden
-  if (typeof bindTouchEvents === "function") {
-    bindTouchEvents();
-  }
+  if (typeof bindTouchEvents === "function") bindTouchEvents();
 }
 
+/**
+ * Resets the game state and starts a fresh run while preserving audio settings.
+ */
 function restartGame() {
   document.getElementById("game-over-screen").classList.add("d-none");
   document.getElementById("win-screen").classList.add("d-none");
-
-  let lastVol = world ? world.globalVolume : currentVolume;
-  let lastMute = world ? world.isMuted : isMuted;
-
+  const lastVol = world ? world.globalVolume : currentVolume;
+  const lastMute = world ? world.isMuted : isMuted;
   clearAllIntervals();
-  if (typeof createLevel1 === "function") createLevel1();
-
+  createLevel1();
   world = new World(canvas, keyboard);
   world.globalVolume = lastVol;
   world.isMuted = lastMute;
   world.applyVolume();
   world.camera_x = 0;
-
-  if (typeof bindTouchEvents === "function") {
-    bindTouchEvents();
-  }
+  if (typeof bindTouchEvents === "function") bindTouchEvents();
 }
 
+/**
+ * Shows the game-over screen and stops all game loops.
+ */
 function showGameOver() {
   document.getElementById("game-over-screen").classList.remove("d-none");
   clearAllIntervals();
 }
 
+/**
+ * Shows the win screen and stops all game loops.
+ */
 function showWin() {
   document.getElementById("win-screen").classList.remove("d-none");
   clearAllIntervals();
 }
 
+/**
+ * Toggles global mute state, persists the setting, and updates the icon.
+ */
 function toggleMute() {
   isMuted = !isMuted;
   localStorage.setItem("gameMuted", isMuted);
-  if (world) {
-    world.toggleMute();
-  }
+  if (world) world.toggleMute();
   document.getElementById("mute-icon").innerText = isMuted ? "🔇" : "🔊";
 }
 
+/**
+ * Updates the global volume, persists it, and applies it to the running world.
+ * @param {string|number} value - New volume level between 0 and 1.
+ */
 function changeVolume(value) {
   currentVolume = parseFloat(value);
   localStorage.setItem("gameVolume", currentVolume);
-  if (world) {
-    world.setVolume(currentVolume);
-  }
+  if (world) world.setVolume(currentVolume);
 }
 
+/**
+ * Toggles fullscreen mode for the main game container element.
+ */
 function toggleFullscreen() {
-  let element = document.getElementById("all-game-contents");
-  if (!document.fullscreenElement) {
-    element.requestFullscreen().catch((err) => console.error(err));
-  } else {
-    document.exitFullscreen();
-  }
+  const element = document.getElementById("all-game-contents");
+  if (!document.fullscreenElement)
+    element.requestFullscreen().catch(console.error);
+  else document.exitFullscreen();
 }
 
-window.addEventListener("keydown", (e) => {
-  if (e.keyCode === 32) e.preventDefault();
-  setKeyState(e.keyCode, true);
-  if (e.keyCode === 70) toggleFullscreen();
-  if (e.keyCode === 77) toggleMute();
-});
-
-window.addEventListener("keyup", (e) => setKeyState(e.keyCode, false));
-
-function setKeyState(keyCode, isPressed) {
+/**
+ * Maps a keyboard keyCode to the corresponding Keyboard property name.
+ * @param {number} keyCode
+ * @returns {string|undefined}
+ */
+function getKeyName(keyCode) {
   const keyMap = {
     39: "RIGHT",
     37: "LEFT",
@@ -131,6 +135,18 @@ function setKeyState(keyCode, isPressed) {
     68: "D",
     77: "M",
   };
-  const key = keyMap[keyCode];
-  if (key) keyboard[key] = isPressed;
+  return keyMap[keyCode];
 }
+
+window.addEventListener("keydown", (e) => {
+  if (e.keyCode === 32) e.preventDefault();
+  const key = getKeyName(e.keyCode);
+  if (key) keyboard[key] = true;
+  if (e.keyCode === 70) toggleFullscreen();
+  if (e.keyCode === 77) toggleMute();
+});
+
+window.addEventListener("keyup", (e) => {
+  const key = getKeyName(e.keyCode);
+  if (key) keyboard[key] = false;
+});
